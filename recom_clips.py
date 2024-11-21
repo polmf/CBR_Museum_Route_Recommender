@@ -584,7 +584,7 @@ def show_paintings_by_rooms(ruta, sales, quadres, visitant):
         if paintings_in_room:
             print(f"Day {day}: The paintings to see in room {room} are:")
             for p, t in paintings_in_room:
-                print(f"  - {p.autor}, time: {t:.2f} minutes")
+                print(f"  - {p.nom}, time: {t:.2f} minutes")
 
     print(f"Total time used on day {day}: {total_time_per_day - remaining_time:.2f} minutes\n")
     #print(f"Total route time: {ruta.temps:.2f} minutes\n")
