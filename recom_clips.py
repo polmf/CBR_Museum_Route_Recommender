@@ -328,7 +328,7 @@ def show_visitor_classification(visitante):
     print(f"Total Knowledge Score: {total_score}")
     
 #Matching
-def calculate_route_scores(visitante, category_museum, category_age, category_knowledge):
+def calculate_route_scores(visitante, category_museum, category_age, category_knowledge, rutes):
     scores = {}
 
     # Ruta 1
@@ -421,26 +421,22 @@ def calculate_route_scores(visitante, category_museum, category_age, category_kn
     # Selección final
     final_route = max(scores, key=scores.get)
     print(f"Based on your preferences and characteristics, the recommended route is: {final_route}")
+    for ruta in rutes:
+        if ruta.nom == final_route:
+            return ruta
 
-    return final_route, scores
 
 
 # Función de integración con la clase Visitant y clasificaciones
 
-def recommend_route(visitante):
+def recommend_route(visitante, rutes):
     # Clasificar visitante según sus datos
     category_museum = classify_museum(visitante.visites)
     category_age = classify_age(visitante.edat)
     category_knowledge, _ = evaluate_knowledge(visitante)
 
     # Calcular puntajes de rutas
-    final_route, scores = calculate_route_scores(visitante, category_museum, category_age, category_knowledge)
-
-    # Mostrar resultados
-    print("\n--- Route Recommendation ---")
-    for route, score in scores.items():
-        print(f"{route}: {score}")
-    print(f"\nRecommended route: {final_route}")
+    final_route = calculate_route_scores(visitante, category_museum, category_age, category_knowledge, rutes)
 
     return final_route
 
@@ -489,16 +485,14 @@ def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_autho
             route.quadres.append(painting)
             route.time += time_for_painting
 
-    #return paintings, route_time
-
 
 def remove_paintings_from_route(route, paintings_of_interest, visitant, quadres):
     max_time = visitant.hores * 60 * visitant.dies
     
     for painting in quadres:
-        if route.temps > max_time and painting not in paintings_of_interest:
+        if route.temps > max_time and painting not in paintings_of_interest and painting in route.quadres:
             time_for_painting = calculate_observation_time(painting)
-            route.quadres.pop(painting)
+            route.quadres.remove(painting)
             route.temps -= time_for_painting
 
 
@@ -573,7 +567,7 @@ def show_paintings_by_rooms(ruta, sales, quadres, visitant):
                     day += 1
 
                     if day > visitant.dies:
-                        print("The route cannot fit into the available days.")
+                        #print("The route cannot fit into the available days.")
                         return
 
                     remaining_time = total_time_per_day - time_for_painting
@@ -587,8 +581,10 @@ def show_paintings_by_rooms(ruta, sales, quadres, visitant):
                 print(f"  - {p.nom}, time: {t:.2f} minutes")
 
     print(f"Total time used on day {day}: {total_time_per_day - remaining_time:.2f} minutes\n")
-    #print(f"Total route time: {ruta.temps:.2f} minutes\n")
+    print(f"Total route time: {ruta.temps:.2f} minutes\n")
 
+def puntuar_ruta():
+    return ask_question_numerical("Puntua la ruta del 1-5? ", 1, 5)
 
 #Init
 
@@ -600,6 +596,7 @@ if __name__ == "__main__":
     salas = assign_salas(quadres)
     visitante = gather_visitor_info()
     show_visitor_classification(visitante)
-    ruta = recommend_route(visitante)
+    ruta = recommend_route(visitante, rutes)
     refine_route(ruta, visitante, quadres)
     show_paintings_by_rooms(ruta, salas, quadres, visitante)
+    puntuacio_ruta = puntuar_ruta()
