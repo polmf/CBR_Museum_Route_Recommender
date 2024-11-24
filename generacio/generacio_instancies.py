@@ -97,7 +97,7 @@ def parse_cuadros(file_path):
 
 # Ejecutar el script
 if __name__ == "__main__":
-    file_path = "cuadros.txt"  # Cambia la ruta al archivo real
+    file_path = "data/cuadros.txt"  # Cambia la ruta al archivo real
     cuadros, autores = parse_cuadros(file_path)
 
     # Asignar las salas según el estilo de cada cuadro
