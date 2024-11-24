@@ -1,5 +1,5 @@
 from classes import Visitant
-from generacio_instancies import *
+from generacio.generacio_instancies import *
 
 class Ruta:
     def __init__(self, nom, quadres, temps=0.0):

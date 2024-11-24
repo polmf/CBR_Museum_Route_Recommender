@@ -2,7 +2,7 @@ import pandas as pd
 from recom_clips import *
 import random
 from classes import Visitant
-from generacio_instancies import assign_salas, parse_cuadros
+from generacio.generacio_instancies import assign_salas, parse_cuadros
 
 def simulate_responses():
     first_visit = random.choice([True, False])
@@ -60,7 +60,7 @@ def simulate_responses():
         interessos_estils=interessos_estils
     )
 
-file_path = "cuadros.txt"  # Cambia la ruta al archivo real
+file_path = "data/cuadros.txt"  # Cambia la ruta al archivo real
 quadres, autores = parse_cuadros(file_path)
 salas = assign_salas(quadres)
 
@@ -74,7 +74,10 @@ def simulate_multiple_visits(id, num_visits):
     for num_visita in range(num_visits):  # Generamos varios registros de visitas para el mismo visitante
         visitante.dies = random.randint(1, 10)  # Cambiamos el número de días de visita
         visitante.hores = random.randint(1, 8)
-        visitante.companyia = random.choice(["alone", "couple", "family", "group"])  # Cambiamos la compañía
+        if visitante.edat < 16:
+            visitante.companyia = random.choice(["couple", "family", "group"])
+        else:
+            visitante.companyia = random.choice(["alone", "couple", "family", "group"])
 
         show_visitor_classification(visitante)
         ruta = recommend_route(visitante, rutes)  # Asignamos una ruta
