@@ -40,4 +40,4 @@ feedback = revisar.collect_feedback()
 
 # Fase de Retener
 # Guardamos el nuevo caso en la base de casos para futuras recomendaciones
-retener = Retener(user_to_recommend)
+retener = Retener(user_to_recommend, feedback)

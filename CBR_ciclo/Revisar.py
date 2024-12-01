@@ -5,8 +5,9 @@ class Revisar:
     Recoger el feedback del usuario y, si no está satisfecho, realizar ajustes en las rutas futuras.
     """
 
-    def __init__(self):
+    def __init__(self, ruta):
         self.feedback = None
+        self.ruta = ruta
 
     def collect_feedback(self):
         """

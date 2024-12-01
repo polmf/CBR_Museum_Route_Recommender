@@ -42,6 +42,7 @@ class Visitant:
         self.quizz = quizz
         self.interessos_autor = interessos_autor if interessos_autor else []
         self.interessos_estils = interessos_estils if interessos_estils else []
+        self.feedback = None
 
     def get_visites(self):
         return self.visites
@@ -73,3 +74,5 @@ class Visitant:
     def get_interessos_estils(self):
         return self.interessos_estils
 
+    def get_feedback(self):
+        return self.feedback

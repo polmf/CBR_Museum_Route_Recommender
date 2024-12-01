@@ -98,7 +98,9 @@ def simulate_multiple_visits(id, num_visits):
             'visitant_quizz': visitante.quizz,
             'visitant_interessos_autor': visitante.interessos_autor,
             'visitant_interessos_estils': visitante.interessos_estils,
-            'ruta': ruta,
+            'ruta': ruta.nom,
+            'ruta_quadres': ruta.quadres,
+            'ruta_temps' : ruta.temps,
             'puntuacio_ruta': puntuacio_ruta
         })
         
