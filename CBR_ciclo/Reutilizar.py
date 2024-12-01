@@ -51,5 +51,10 @@ class Reutilizar:
         
         # Otros ajustes basados en las preferencias del usuario
         # ...
+        routes = []
+        for user_id, _ in self.top_5_similar_users:
+            user_data = self._base_de_casos[self._base_de_casos['visitante_id'] == user_id]
+            user_routes = [user_data['ruta'], user_data['ruta_quadres'], user_data['ruta_temps']]
+            routes.extend(user_routes)
         
-        return route
+        return routes 
