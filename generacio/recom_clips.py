@@ -1,5 +1,5 @@
 from classes import Visitant
-from generacio.generacio_instancies import *
+from generacio_instancies import *
 
 class Ruta:
     def __init__(self, nom, quadres, temps=0.0):
@@ -7,6 +7,14 @@ class Ruta:
         self.quadres = quadres
         self.temps = temps
 
+    def get_nom(self):
+        return self.nom
+    
+    def get_quadres(self):
+        return self.quadres
+    
+    def get_temps(self):
+        return self.temps
 
 rutes = [
     Ruta(
