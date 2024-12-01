@@ -24,16 +24,15 @@ class Reutilizar:
         routes = []
         for user_id, _ in self.top_5_similar_users:
             user_data = self._base_de_casos[self._base_de_casos['visitante_id'] == user_id]
-            user_routes = user_data['ruta'].tolist()
+            user_routes = user_data['ruta']
             routes.extend(user_routes)
-            print(routes)
         # Calcular la ruta más repetida
         route_counts = {}
         for route in routes:
-            if route.get_nom() in route_counts:
-                route_counts[route.get_nom()] += 1
+            if route in route_counts:
+                route_counts[route] += 1
             else:
-                route_counts[route.get_nom()] = 1
+                route_counts[route] = 1
 
         most_common_route = max(route_counts, key=route_counts.get)
         return most_common_route

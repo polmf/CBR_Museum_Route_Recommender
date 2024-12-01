@@ -483,14 +483,14 @@ def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_autho
 
     for painting in new_paintings_by_style:
         time_for_painting = calculate_observation_time(painting)
-        if painting not in route.quadres and route.time + time_for_painting < max_time:
-            route.quadres.append(painting)
+        if painting.name not in route.quadres and route.time + time_for_painting < max_time:
+            route.quadres.append(painting.nom)
             route.time += time_for_painting
 
     for painting in new_paintings_by_author:
         time_for_painting = calculate_observation_time(painting)
-        if painting not in route.quadres and route.author_intereststime + time_for_painting < max_time:
-            route.quadres.append(painting)
+        if painting.name not in route.quadres and route.author_intereststime + time_for_painting < max_time:
+            route.quadres.append(painting.nom)
             route.time += time_for_painting
 
 
@@ -498,9 +498,9 @@ def remove_paintings_from_route(route, paintings_of_interest, visitant, quadres)
     max_time = visitant.hores * 60 * visitant.dies
     
     for painting in quadres:
-        if route.temps > max_time and painting not in paintings_of_interest and painting in route.quadres:
+        if route.temps > max_time and painting.nom not in paintings_of_interest and painting in route.quadres:
             time_for_painting = calculate_observation_time(painting)
-            route.quadres.remove(painting)
+            route.quadres.remove(painting.nom)
             route.temps -= time_for_painting
 
 
@@ -510,9 +510,9 @@ def fill_remaining_time(route, visitant, quadres):
     max_time = visitant.hores * 60 * visitant.dies
     
     for painting in quadres:
-        if route.temps < max_time:
+        if route.temps < max_time and painting.nom not in route.quadres:
             time_for_painting = calculate_observation_time(painting)
-            route.quadres.append(painting)
+            route.quadres.append(painting.nom)
             route.temps += time_for_painting
     
 
