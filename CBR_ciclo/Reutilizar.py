@@ -13,7 +13,7 @@ class Reutilizar:
     """
 
     def __init__(self, user_to_recommend, top_5_similar_users):
-        self._base_de_casos = pd.read_csv("data/base_de_casos.csv")
+        self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
         self.user_to_recommend = user_to_recommend
         self.top_5_similar_users = top_5_similar_users
 
@@ -26,14 +26,14 @@ class Reutilizar:
             user_data = self._base_de_casos[self._base_de_casos['visitante_id'] == user_id]
             user_routes = user_data['ruta'].tolist()
             routes.extend(user_routes)
-
+            print(routes)
         # Calcular la ruta más repetida
         route_counts = {}
         for route in routes:
-            if route.name in route_counts:
-                route_counts[route.name] += 1
+            if route.get_nom() in route_counts:
+                route_counts[route.get_nom()] += 1
             else:
-                route_counts[route.name] = 1
+                route_counts[route.get_nom()] = 1
 
         most_common_route = max(route_counts, key=route_counts.get)
         return most_common_route
@@ -43,12 +43,12 @@ class Reutilizar:
         Ajusta la ruta recomendada a las preferencias del nuevo usuario.
         """
         # Ajustar la duración de la ruta
-        if route.duration > self.user_to_recommend.max_duration:
-            route.duration = self.user_to_recommend.max_duration
+        """if route.get_temps() > self.user_to_recommend.get_hores():
+            route.get_temps() = self.user_to_recommend.get_hores()"""
         
         # Ajustar la dificultad de la ruta
-        if route.difficulty > self.user_to_recommend.max_difficulty:
-            route.difficulty = self.user_to_recommend.max_difficulty
+        """if route.difficulty > self.user_to_recommend.max_difficulty:
+            route.difficulty = self.user_to_recommend.max_difficulty"""
         
         # Otros ajustes basados en las preferencias del usuario
         # ...

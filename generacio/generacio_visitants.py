@@ -2,7 +2,7 @@ import pandas as pd
 from recom_clips import *
 import random
 from classes import Visitant
-from generacio.generacio_instancies import assign_salas, parse_cuadros
+from generacio_instancies import assign_salas, parse_cuadros
 
 def simulate_responses():
     first_visit = random.choice([True, False])
