@@ -24,4 +24,4 @@ class Revisar:
         """
         print("Estas son las rutas recomendadas para ti:")
         # Mostrar rutas
-        pass
+        return self.ruta
