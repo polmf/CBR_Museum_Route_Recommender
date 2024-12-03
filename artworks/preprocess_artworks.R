@@ -6,15 +6,20 @@ nrow(artworks)
 artworks_1 <- artworks[, c("Title", "Artist", "ConstituentID", "Date", "Medium", "Dimensions", "Classification", "URL", "ImageURL")]
 colnames(artworks_1)
 
+# Ens quedem amb una sola aparicio dels que tenen el mateix titol
+artworks_1 <- artworks_1 %>% distinct(Title, .keep_all = TRUE)
+
+
 unique(artworks_1$Classification)
 artworks_2 <- subset(artworks_1, Classification %in% c("Print", "Drawing", "Graphic Design", "Painting", "Poster", "Collage", "Digital", "Moving Image"))
 nrow(artworks_2)
 
+# PROBLEMA: moltes es queden en NA
 artworks_3 <- artworks_2 %>%
   mutate(
     cm_values = gsub(".*\\((.*) cm\\).*", "\\1", Dimensions),
     width_height = strsplit(cm_values, " x "),
-    dim_cm2 = sapply(width_height, function(x) {
+    Dim_cm2 = sapply(width_height, function(x) {
       if (length(x) == 2) {
         as.numeric(x[1]) * as.numeric(x[2])
       } else {
@@ -23,7 +28,9 @@ artworks_3 <- artworks_2 %>%
     })
   )
 
-head(artworks_3[, c("dim_cm2")])
+artworks_3 <- artworks_3 %>% select(-c(width_height, cm_values, Dimensions))
+
+head(artworks_3[, c("Dim_cm2")])
 nrow(artworks_3)
 
 # Asegurarnos de que 'artworks_subset' sea un data frame
@@ -58,7 +65,7 @@ library(dplyr)
 # Añadir la columna 'estilo' según los rangos de años definidos
 artworks_subset_1 <- artworks_subset %>%
   mutate(
-    estilo = case_when(
+    Style = case_when(
       Date >= 1800 & Date < 1850 ~ "Romanticismo",
       Date >= 1850 & Date < 1880 ~ "Realismo",
       Date >= 1880 & Date < 1905 ~ "Impresionismo",
@@ -73,9 +80,13 @@ artworks_subset_1 <- artworks_subset %>%
   )
 
 # Verificar los primeros resultados
-head(artworks_subset_1[, c("Date", "estilo")])
+head(artworks_subset_1[, c("Date", "Style")])
+
+list_cols <- sapply(artworks_subset_1, is.list)
+list_cols
 
 # Suponiendo que 'final_data' es tu DataFrame al final del script
+getwd()
 write.csv(artworks_subset_1, file = "artworks_subset.csv", row.names = FALSE)
 
 
