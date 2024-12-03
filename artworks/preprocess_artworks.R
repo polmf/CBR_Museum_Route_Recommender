@@ -53,5 +53,32 @@ print(paste("El año más antiguo es:", anio_mas_antiguo))
 print(paste("El año más reciente es:", anio_mas_reciente))
 
 
+library(dplyr)
+
+# Añadir la columna 'estilo' según los rangos de años definidos
+artworks_subset_1 <- artworks_subset %>%
+  mutate(
+    estilo = case_when(
+      Date >= 1800 & Date < 1850 ~ "Romanticismo",
+      Date >= 1850 & Date < 1880 ~ "Realismo",
+      Date >= 1880 & Date < 1905 ~ "Impresionismo",
+      Date >= 1905 & Date < 1920 ~ "Cubismo",
+      Date >= 1920 & Date < 1940 ~ "Surrealismo",
+      Date >= 1940 & Date < 1960 ~ "Expresionismo Abstracto",
+      Date >= 1960 & Date < 1980 ~ "Pop Art",
+      Date >= 1980 & Date < 2000 ~ "Postmodernismo",
+      Date >= 2000 & Date <= 2024 ~ "Arte Contemporáneo",
+      TRUE ~ NA_character_  # Asignar NA a cualquier valor que no entre en los rangos especificados
+    )
+  )
+
+# Verificar los primeros resultados
+head(artworks_subset_1[, c("Date", "estilo")])
+
+# Suponiendo que 'final_data' es tu DataFrame al final del script
+write.csv(artworks_subset_1, file = "artworks_subset.csv", row.names = FALSE)
+
+
+
 
 
