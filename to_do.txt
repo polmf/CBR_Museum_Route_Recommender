@@ -1,0 +1,6 @@
+
+
+1. fer un clip en la generacio de visitants perque les gaussianes no tenen limit
+2. Reutilitzar -> tenim els casos mes semblants o que representen al nou usuari i dsps hem de calcular les 3 rutes dels usuaris
+mes similars al nou cas que entra. 
+3. mesura d'utilitat: ultima vegada utilitzat + numero de vegades que s'ha utilitat i el feedback (puntuacio de la ruta + quant has seguit la ruta?) 
