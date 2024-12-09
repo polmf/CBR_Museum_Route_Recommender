@@ -6,12 +6,15 @@ nrow(artworks)
 artworks_1 <- artworks[, c("Title", "Artist", "ConstituentID", "Date", "Medium", "Dimensions", "Classification", "URL", "ImageURL")]
 colnames(artworks_1)
 
-# Ens quedem amb una sola aparicio dels que tenen el mateix titol
+# Ens quedem amb una sola aparicio de les obres que tenen el mateix titol
 artworks_1 <- artworks_1 %>% distinct(Title, .keep_all = TRUE)
-
+nrow(artworks_1)
 
 unique(artworks_1$Classification)
-artworks_2 <- subset(artworks_1, Classification %in% c("Print", "Drawing", "Graphic Design", "Painting", "Poster", "Collage", "Digital", "Moving Image"))
+
+# ens quedem només amb els que tinguin les següents classificacions (per descartar escultures, vídeos, etc)
+# com la base de dades és molt gran ens ho podem permetre
+artworks_2 <- subset(artworks_1, Classification %in% c("Print", "Drawing", "Painting", "Poster", "Collage", "Digital"))
 nrow(artworks_2)
 
 # PROBLEMA: moltes es queden en NA
@@ -26,32 +29,33 @@ artworks_3 <- artworks_2 %>%
         NA
       }
     })
-  )
+  ) %>%
+  select(-c(width_height, cm_values, Dimensions)) 
 
-artworks_3 <- artworks_3 %>% select(-c(width_height, cm_values, Dimensions))
+sum(is.na(artworks_3$Dim_cm2))  # Comprovar quantes files tenen NA
 
-head(artworks_3[, c("Dim_cm2")])
+artworks_3 <- artworks_3 %>% filter(!is.na(Dim_cm2)) # aqui ens carreguem un munt: de moment es la manera. Intentar millorar-ho 
 nrow(artworks_3)
 
-# Asegurarnos de que 'artworks_subset' sea un data frame
-if (!is.data.frame(artworks_3)) {
-  artworks_3 <- data.frame(artworks_3, stringsAsFactors = FALSE)
-}
-
+head(artworks_3[, "Dim_cm2"]) # veie, que queda en cm quadrats
 colnames(artworks_3)
 
-# Limpiar la columna 'Date' para extraer solo el primer año presente y convertir a numérico si es posible
+# preprocessar data
 artworks_subset <- artworks_3 %>%
-  filter(!is.na(Date) & Date != "") %>%  # Eliminar filas con valores NA o vacíos en Date
+  filter(!is.na(Date) & Date != "" & Date != "Unknown") %>%  # Eliminar files amb valors buits o NA a 'Date'
   mutate(
-    Date = gsub(".*?(\\b\\d{4}\\b).*", "\\1", Date),  # Extraer el primer año que aparece en Date
-    Date = ifelse(grepl("^\\d{4}$", Date), as.numeric(Date), NA)  # Convertir a numérico si el valor es válido
+    # Extreure només el primer any que apareix a 'Date'
+    Date = gsub(".*?(\\b\\d{4}\\b).*", "\\1", Date),
+    # Comprovar que el valor extret és un any vàlid abans de convertir-lo a numèric
+    Date = ifelse(grepl("^\\d{4}$", Date), as.numeric(Date), NA)
   )
+nrow(artworks_subset)
+table(is.na(artworks_subset$Date))  # Comprovar quantes files tenen NA a 'Date'
+artworks_subset <- artworks_subset %>% filter(!is.na(Date)) # eliminarles
 
-# Verificar los resultados
 head(artworks_subset$Date)
 
-# Extraer el año más antiguo y el más reciente
+#  año más antiguo y el más reciente
 anio_mas_antiguo <- min(artworks_subset$Date, na.rm = TRUE)
 anio_mas_reciente <- max(artworks_subset$Date, na.rm = TRUE)
 
@@ -59,11 +63,10 @@ anio_mas_reciente <- max(artworks_subset$Date, na.rm = TRUE)
 print(paste("El año más antiguo es:", anio_mas_antiguo))
 print(paste("El año más reciente es:", anio_mas_reciente))
 
-
 library(dplyr)
 
-# Añadir la columna 'estilo' según los rangos de años definidos
-artworks_subset_1 <- artworks_subset %>%
+# añadimos la columna 'estilo' según los rangos de años definidos
+artworks_final <- artworks_subset %>%
   mutate(
     Style = case_when(
       Date >= 1800 & Date < 1850 ~ "Romanticismo",
@@ -79,17 +82,20 @@ artworks_subset_1 <- artworks_subset %>%
     )
   )
 
-# Verificar los primeros resultados
-head(artworks_subset_1[, c("Date", "Style")])
 
-list_cols <- sapply(artworks_subset_1, is.list)
+head(artworks_final[, c("Date", "Style")])
+
+list_cols <- sapply(artworks_final, is.list)
 list_cols
 
-# Suponiendo que 'final_data' es tu DataFrame al final del script
 getwd()
-write.csv(artworks_subset_1, file = "artworks_subset.csv", row.names = FALSE)
+write.csv(artworks_final, file = "artworks_final.csv", row.names = FALSE)
+colnames(artworks_final)
 
+# artworks_subset_1 te missing data, pero no es important
 
-
-
+# fem una base de dades sense url per poder fer clustering sense tenir info irrellevant en compte
+artworks_4clustering <- artworks_final[, c("Title","Artist","ConstituentID","Date","Medium","Classification","Dim_cm2","Style")]
+getwd()
+write.csv(artworks_4clustering, file = "artworks_4clustering.csv", row.names = FALSE)
 
