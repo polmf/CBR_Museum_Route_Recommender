@@ -7,17 +7,22 @@ from sklearn.decomposition import PCA
 
 data = pd.read_csv("C:/Users/lolam/Desktop/SBC_2/artworks_data/artworks_final.csv") # no va a ser necesario _4clustering
 
-features = ["Date", "Medium", "Style"]
+features = ["Artist", "ConstituentID", "Date", "Medium", "Style", "Dim_cm2"]
+
+data['ConstituentID'] = data['ConstituentID'].str.split(',').str[0].astype(float)
 
 
 le_style = LabelEncoder()
 data['Style_encoded'] = le_style.fit_transform(data['Style'])
 
+le_artist = LabelEncoder()
+data['Artist_encoded'] = le_artist.fit_transform(data['Artist'])
+
 le_medium = LabelEncoder()
 data['Medium_encoded'] = le_medium.fit_transform(data['Medium'])
 
 # Crear un nuevo dataframe con las características para clustering
-clustering_data = data[[ 'Date', 'Style_encoded','Medium_encoded']].dropna()
+clustering_data = data[['Dim_cm2', 'Date', 'Style_encoded', 'Artist_encoded', 'Medium_encoded', 'ConstituentID']].dropna()
 
 # Normalizar las características
 scaler = StandardScaler()
@@ -34,13 +39,13 @@ for k in k_range:
 # # descomentar para visualizar el método del codo
 # plt.figure(figsize=(8, 5))
 # plt.plot(k_range, inertia, marker='o')
-# plt.title("Método del Codo para Determinar el Número de Clusters (para clust_2)")
+# plt.title("Método del Codo para Determinar el Número de Clusters")
 # plt.xlabel("Número de Clusters")
 # plt.ylabel("Inercia")
 # plt.show()
 
-# número óptimo de clusters --> 4
-kmeans = KMeans(n_clusters=4, random_state=42)  
+# número óptimo de clusters --> 5
+kmeans = KMeans(n_clusters=5, random_state=42)  
 clustering_data['Cluster'] = kmeans.fit_predict(clustering_data_scaled)
 
 # Reducir a 2 dimensiones para la visualización con PCA
@@ -59,7 +64,7 @@ sns.scatterplot(
     hue=clustering_data['Cluster'],
     palette='viridis'
 )
-plt.title("Clusters de Obras de Arte (PCA) (para features style, medium y date)")
+plt.title("Clusters de Obras de Arte (PCA)")
 plt.xlabel("PCA1")
 plt.ylabel("PCA2")
 plt.legend(title="Cluster")

@@ -94,8 +94,3 @@ colnames(artworks_final)
 
 # artworks_subset_1 te missing data, pero no es important
 
-# fem una base de dades sense url per poder fer clustering sense tenir info irrellevant en compte
-artworks_4clustering <- artworks_final[, c("Title","Artist","ConstituentID","Date","Medium","Classification","Dim_cm2","Style")]
-getwd()
-write.csv(artworks_4clustering, file = "artworks_4clustering.csv", row.names = FALSE)
-
