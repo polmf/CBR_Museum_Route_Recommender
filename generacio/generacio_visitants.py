@@ -110,7 +110,7 @@ def simulate_multiple_visits(id, num_visits):
             'visitant_interessos_estils': visitante.interessos_estils,
             'ruta': ruta.nom,
             'ruta_quadres': ruta.quadres,
-            'ruta_temps' : ruta.temps,
+            'ruta_temps' : round(ruta.temps),
             'puntuacio_ruta': puntuacio_ruta
         })
         
