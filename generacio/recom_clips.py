@@ -2,9 +2,10 @@ from classes import *
 import random
 import json
 class Ruta:
-    def __init__(self, nom, instancies, quadres = [], temps=0.0):
+    def __init__(self, nom, instancies, sales_ocupades = {}, quadres = [], temps=0.0):
         self.nom = nom
         self.instancies = instancies
+        self.sales_ocupades = sales_ocupades
         self.quadres = quadres
         self.temps = temps
 
@@ -58,148 +59,185 @@ def rutes_predeterminades(quadres):
     quadres_mig_complexitat = [quadre for quadre in quadres if quadre.complexitat < 5.5 and quadre.complexitat <= 7.9]
     
     # Función para seleccionar cuadros sin repetir dentro de la misma ruta
-    def seleccionar_quadres(quadres_list, num_quadres, cuadros_seleccionados_ruta):
-        disponibles = [quadre for quadre in quadres_list if quadre.nom not in cuadros_seleccionados_ruta]
+    def seleccionar_quadres(quadres_list, num_quadres, cuadros_seleccionados_ruta, sales_ocupades):
+        disponibles = [quadre for quadre in quadres_list 
+                    if quadre.nom not in cuadros_seleccionados_ruta and sales_ocupades.get(quadre.sala, 0) < 10]
+        
         seleccionados = random.sample(disponibles, min(num_quadres, len(disponibles)))
+    
+        for quadre in seleccionados:
+            if quadre.sala not in sales_ocupades:
+                sales_ocupades[quadre.sala] = 0
+            sales_ocupades[quadre.sala] += 1
+        
         cuadros_seleccionados_ruta.update(quadre.nom for quadre in seleccionados)
+        
         return seleccionados
     
     # Ruta 1
+    sales_ocupades_ruta1 = {}
     cuadros_seleccionados_ruta1 = set()  # Conjunto para la ruta 1
     ruta1 = Ruta(
         nom="ruta1",
-        instancies=seleccionar_quadres(quadres_rellevants, 15, cuadros_seleccionados_ruta1) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta1),
+        instancies=seleccionar_quadres(quadres_rellevants, 15, cuadros_seleccionados_ruta1, sales_ocupades_ruta1) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta1, sales_ocupades_ruta1),
     )
+    ruta1.sales_ocupades = sales_ocupades_ruta1
     ruta1.quadres = [quadre.nom for quadre in ruta1.instancies]
     ruta1.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta1.instancies)
     rutes.append(ruta1)
 
     # Ruta 2
+    sales_ocupades_ruta2 = {}
     cuadros_seleccionados_ruta2 = set()  # Conjunto para la ruta 2
     ruta2 = Ruta(
         nom="ruta2",
-        instancies=seleccionar_quadres(quadres_rellevants, 15, cuadros_seleccionados_ruta2) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta2),
+        instancies=seleccionar_quadres(quadres_rellevants, 15, cuadros_seleccionados_ruta2, sales_ocupades_ruta2) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta2, sales_ocupades_ruta2),
     )
+    ruta2.sales_ocupades = sales_ocupades_ruta2
     ruta2.quadres = [quadre.nom for quadre in ruta2.instancies]
     ruta2.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta2.instancies)
     rutes.append(ruta2)
 
     # Ruta 3
+    sales_ocupades_ruta3 = {}
     cuadros_seleccionados_ruta3 = set()  # Conjunto para la ruta 3
     ruta3 = Ruta(
         nom="ruta3",
-        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta3) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta3) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta3),
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta3, sales_ocupades_ruta3) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta3, sales_ocupades_ruta3) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta3, sales_ocupades_ruta3),
     )
+    ruta3.sales_ocupades = sales_ocupades_ruta3
     ruta3.quadres = [quadre.nom for quadre in ruta3.instancies]
     ruta3.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta3.instancies)
     rutes.append(ruta3)
 
     # Ruta 4
+    sales_ocupades_ruta4 = {}
     cuadros_seleccionados_ruta4 = set()  # Conjunto para la ruta 4
     ruta4 = Ruta(
         nom="ruta4",
-        instancies=seleccionar_quadres(quadres_rellevants, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_complexitat, 5, cuadros_seleccionados_ruta4),
+        instancies=seleccionar_quadres(quadres_rellevants, 5, cuadros_seleccionados_ruta4, sales_ocupades_ruta4) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta4, sales_ocupades_ruta4) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta4, sales_ocupades_ruta4) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta4, sales_ocupades_ruta4) + seleccionar_quadres(quadres_complexitat, 5, cuadros_seleccionados_ruta4, sales_ocupades_ruta4),
     )
+    ruta4.sales_ocupades = sales_ocupades_ruta4
     ruta4.quadres = [quadre.nom for quadre in ruta4.instancies]
     ruta4.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta4.instancies)
     rutes.append(ruta4)
 
     # Ruta 5
+    sales_ocupades_ruta5 = {}
     cuadros_seleccionados_ruta5 = set()  # Conjunto para la ruta 5
     ruta5 = Ruta(
         nom="ruta5",
-        instancies=seleccionar_quadres(quadres_rellevants, 25, cuadros_seleccionados_ruta5) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta5) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta5),
+        instancies=seleccionar_quadres(quadres_rellevants, 25, cuadros_seleccionados_ruta5, sales_ocupades_ruta5) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta5, sales_ocupades_ruta5) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta5, sales_ocupades_ruta5),
     )
+    ruta5.sales_ocupades = sales_ocupades_ruta5
     ruta5.quadres = [quadre.nom for quadre in ruta5.instancies]
     ruta5.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta5.instancies)
     rutes.append(ruta5)
 
     # Ruta 6
+    sales_ocupades_ruta6 = {}
     cuadros_seleccionados_ruta6 = set()  # Conjunto para la ruta 6
     ruta6 = Ruta(
         nom="ruta6",
-        instancies=seleccionar_quadres(quadres_rellevants, 20, cuadros_seleccionados_ruta6) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta6) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta6) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta6),
+        instancies=seleccionar_quadres(quadres_rellevants, 20, cuadros_seleccionados_ruta6, sales_ocupades_ruta6) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta6, sales_ocupades_ruta6) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta6, sales_ocupades_ruta6) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta6, sales_ocupades_ruta6),
     )
+    ruta6.sales_ocupades = sales_ocupades_ruta6
     ruta6.quadres = [quadre.nom for quadre in ruta6.instancies]
     ruta6.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta6.instancies)
     rutes.append(ruta6)
 
     # Ruta 7
+    sales_ocupades_ruta7 = {}
     cuadros_seleccionados_ruta7 = set()  # Conjunto para la ruta 7
     ruta7 = Ruta(
         nom="ruta7",
-        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta7),
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta7, sales_ocupades_ruta7) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta7, sales_ocupades_ruta7) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta7, sales_ocupades_ruta7) + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta7, sales_ocupades_ruta7) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta7, sales_ocupades_ruta7),
     )
+    ruta7.sales_ocupades = sales_ocupades_ruta7
     ruta7.quadres = [quadre.nom for quadre in ruta7.instancies]
     ruta7.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta7.instancies)
     rutes.append(ruta7)
 
     # Ruta 8
+    sales_ocupades_ruta8 = {}
     cuadros_seleccionados_ruta8 = set()  # Conjunto para la ruta 8
     ruta8 = Ruta(
         nom="ruta8",
-        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_complexitat, 5, cuadros_seleccionados_ruta8),
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta8, sales_ocupades_ruta8) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta8, sales_ocupades_ruta8) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta8, sales_ocupades_ruta8) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta8, sales_ocupades_ruta8) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta8, sales_ocupades_ruta8) + seleccionar_quadres(quadres_complexitat, 5, cuadros_seleccionados_ruta8, sales_ocupades_ruta8),
     )
+    ruta8.sales_ocupades = sales_ocupades_ruta8
     ruta8.quadres = [quadre.nom for quadre in ruta8.instancies]
     ruta8.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta8.instancies)
     rutes.append(ruta8)
 
     # Ruta 9
+    sales_ocupades_ruta9 = {}
     cuadros_seleccionados_ruta9 = set()  # Conjunto para la ruta 9
     ruta9 = Ruta(
         nom="ruta9",
-        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_complexitat, 15, cuadros_seleccionados_ruta9),
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta9, sales_ocupades_ruta9) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta9, sales_ocupades_ruta9) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta9, sales_ocupades_ruta9) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta9, sales_ocupades_ruta9) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta9, sales_ocupades_ruta9) + seleccionar_quadres(quadres_complexitat, 15, cuadros_seleccionados_ruta9, sales_ocupades_ruta9),
     )
+    ruta9.sales_ocupades = sales_ocupades_ruta9
     ruta9.quadres = [quadre.nom for quadre in ruta9.instancies]
     ruta9.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta9.instancies)
     rutes.append(ruta9)
 
     # Ruta 10
+    sales_ocupades_ruta10 = {}
     cuadros_seleccionados_ruta10 = set()  # Conjunto para la ruta 10
     ruta10 = Ruta(
         nom="ruta10",
-        instancies=seleccionar_quadres(quadres_rellevants, 30, cuadros_seleccionados_ruta10) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta10) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta10) + seleccionar_quadres(quadres_poc_complexitat, 15, cuadros_seleccionados_ruta10),
+        instancies=seleccionar_quadres(quadres_rellevants, 30, cuadros_seleccionados_ruta10, sales_ocupades_ruta10) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta10, sales_ocupades_ruta10) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta10, sales_ocupades_ruta10) + seleccionar_quadres(quadres_poc_complexitat, 15, cuadros_seleccionados_ruta10, sales_ocupades_ruta10),
     )
+    ruta10.sales_ocupades = sales_ocupades_ruta10
     ruta10.quadres = [quadre.nom for quadre in ruta10.instancies]
     ruta10.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta10.instancies)
     rutes.append(ruta10)
 
     # Ruta 11
+    sales_ocupades_ruta11 = {}
     cuadros_seleccionados_ruta11 = set()  # Conjunto para la ruta 11
     ruta11 = Ruta(
         nom="ruta11",
-        instancies=seleccionar_quadres(quadres_rellevants, 25, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_poc_complexitat, 15, cuadros_seleccionados_ruta11)  + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta11),
+        instancies=seleccionar_quadres(quadres_rellevants, 25, cuadros_seleccionados_ruta11, sales_ocupades_ruta11) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta11, sales_ocupades_ruta11) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta11, sales_ocupades_ruta11) + seleccionar_quadres(quadres_poc_complexitat, 15, cuadros_seleccionados_ruta11, sales_ocupades_ruta11)  + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta11, sales_ocupades_ruta11) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta11, sales_ocupades_ruta11),
     )
+    ruta11.sales_ocupades = sales_ocupades_ruta11
     ruta11.quadres = [quadre.nom for quadre in ruta11.instancies]
     ruta11.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta11.instancies)
     rutes.append(ruta11)
 
     # Ruta 12
+    sales_ocupades_ruta12 = {}
     cuadros_seleccionados_ruta12 = set()  # Conjunto para la ruta 12
     ruta12 = Ruta(
         nom="ruta12",
-        instancies=seleccionar_quadres(quadres_rellevants, 20, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_poc_mig_complexitat, 20, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta12),
+        instancies=seleccionar_quadres(quadres_rellevants, 20, cuadros_seleccionados_ruta12, sales_ocupades_ruta12) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta12, sales_ocupades_ruta12) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta12, sales_ocupades_ruta12) + seleccionar_quadres(quadres_poc_mig_complexitat, 20, cuadros_seleccionados_ruta12, sales_ocupades_ruta12) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta12, sales_ocupades_ruta12),
     )
+    ruta12.sales_ocupades = sales_ocupades_ruta12
     ruta12.quadres = [quadre.nom for quadre in ruta12.instancies]
     ruta12.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta12.instancies)
     rutes.append(ruta12)
 
     # Ruta 13
+    sales_ocupades_ruta13 = {}
     cuadros_seleccionados_ruta13 = set()  # Conjunto para la ruta 13
     ruta13 = Ruta(
         nom="ruta13",
-        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_poc_mig_rellevants, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_poc_rellevants, 5, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_complexitat, 10, cuadros_seleccionados_ruta13),
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta13, sales_ocupades_ruta13) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta13, sales_ocupades_ruta13) + seleccionar_quadres(quadres_poc_mig_rellevants, 15, cuadros_seleccionados_ruta13, sales_ocupades_ruta13) + seleccionar_quadres(quadres_poc_rellevants, 5, cuadros_seleccionados_ruta13, sales_ocupades_ruta13) + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta13, sales_ocupades_ruta13) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta13, sales_ocupades_ruta13) + seleccionar_quadres(quadres_complexitat, 10, cuadros_seleccionados_ruta13, sales_ocupades_ruta13),
     )
+    ruta13.sales_ocupades = sales_ocupades_ruta13
     ruta13.quadres = [quadre.nom for quadre in ruta13.instancies]
     ruta13.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta13.instancies)
     rutes.append(ruta13)
 
     # Ruta 14
+    sales_ocupades_ruta14 = {}
     cuadros_seleccionados_ruta14 = set()  # Conjunto para la ruta 14
     ruta14 = Ruta(
         nom="ruta14",
-        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta14)  + seleccionar_quadres(quadres_poc_mig_rellevants, 15, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_poc_rellevants, 5, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_complexitat, 20, cuadros_seleccionados_ruta14),
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta14, sales_ocupades_ruta14) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta14, sales_ocupades_ruta14)  + seleccionar_quadres(quadres_poc_mig_rellevants, 15, cuadros_seleccionados_ruta14, sales_ocupades_ruta14) + seleccionar_quadres(quadres_poc_rellevants, 5, cuadros_seleccionados_ruta14, sales_ocupades_ruta14) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta14, sales_ocupades_ruta14) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta14, sales_ocupades_ruta14) + seleccionar_quadres(quadres_complexitat, 20, cuadros_seleccionados_ruta14, sales_ocupades_ruta14),
     )
+    ruta14.sales_ocupades = sales_ocupades_ruta14
     ruta14.quadres = [quadre.nom for quadre in ruta14.instancies]
     ruta14.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta14.instancies)
     rutes.append(ruta14)
@@ -656,15 +694,19 @@ def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_autho
 
     for painting in new_paintings_by_style:
         time_for_painting = calculate_observation_time(painting, knowledge_factor)
-        if painting.name not in route.quadres and route.time + time_for_painting < max_time:
+        #if route.sales_ocupades.get(painting.sala, 0) < 10  and route.temps + time_for_painting < max_time and  painting.nom not in route.quadres:
+        if route.temps + time_for_painting < max_time and  painting.nom not in route.quadres:
             route.quadres.append(painting.nom)
-            route.time += time_for_painting
+            route.instancies.append(painting)
+            route.temps += time_for_painting
 
     for painting in new_paintings_by_author:
         time_for_painting = calculate_observation_time(painting, knowledge_factor)
-        if painting.name not in route.quadres and route.author_intereststime + time_for_painting < max_time:
+        #if route.sales_ocupades.get(painting.sala, 0) <=10  and route.temps + time_for_painting < max_time and  painting.nom not in route.quadres:
+        if route.temps + time_for_painting < max_time and  painting.nom not in route.quadres:
             route.quadres.append(painting.nom)
-            route.time += time_for_painting
+            route.instancies.append(painting)
+            route.temps += time_for_painting
 
 
 def remove_paintings_from_route(route, paintings_of_interest, visitant, quadres, knowledge_factor):
@@ -674,6 +716,7 @@ def remove_paintings_from_route(route, paintings_of_interest, visitant, quadres,
         if route.temps > max_time and painting.nom not in paintings_of_interest and painting in route.quadres:
             time_for_painting = calculate_observation_time(painting, knowledge_factor)
             route.quadres.remove(painting.nom)
+            route.instancies.remove(painting)
             route.temps -= time_for_painting
 
 
@@ -683,9 +726,11 @@ def fill_remaining_time(route, visitant, quadres, knowledge_factor):
     max_time = visitant.hores * 60 * visitant.dies
     
     for painting in quadres:
+        #if route.sales_ocupades.get(painting.sala, 0) < 10 and route.temps < max_time and painting.nom not in route.quadres:
         if route.temps < max_time and painting.nom not in route.quadres:
             time_for_painting = calculate_observation_time(painting, knowledge_factor)
             route.quadres.append(painting.nom)
+            route.instancies.append(painting)
             route.temps += time_for_painting
     
 
@@ -721,8 +766,106 @@ def refine_route(route, visitante, all_paintings, knowledge_factor):
 
 #Print final
 
+def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
+    total_time_per_day = visitant.hores * 60 + (visitant.hores * 60 * 0.1)  # Tiempo total disponible por día en minutos
+    sales = {}
 
-def show_paintings_by_rooms(ruta, sales, quadres, visitant, knowledge_factor):
+    # Organizar las pinturas por salas
+    for quadre in ruta.instancies:
+        sala = quadre.sala
+        if sala not in sales:
+            sales[sala] = []
+        sales[sala].append(quadre)
+
+    print(f"Details for {ruta.nom}:")
+
+    day = 1
+    time_spent_today = 0
+    paintings_to_see = []
+
+    # Ordenar las salas por número (para asegurar que las salas se visiten en orden)
+    for sala in sorted(sales.keys()):
+        llista_cuadres = sales[sala]
+
+        # Recorrer las pinturas de la sala
+        for quadre in llista_cuadres:
+            time_for_painting = calculate_observation_time(quadre, knowledge_factor)
+
+            # Si el tiempo actual más el tiempo de la pintura no excede el tiempo disponible del día
+            if time_spent_today + time_for_painting <= total_time_per_day:
+                paintings_to_see.append((sala, quadre, time_for_painting))
+                time_spent_today += time_for_painting
+            else:
+                # Si no cabe más pintura en este día, muestra las pinturas del día actual
+                print(f"Day {day}:")
+                # Agrupar las pinturas por sala
+                rooms_visited = {}
+                for sala_painting, quadre_painting, time_painting in paintings_to_see:
+                    if sala_painting not in rooms_visited:
+                        rooms_visited[sala_painting] = []
+                    rooms_visited[sala_painting].append((quadre_painting, time_painting))
+                
+                for sala_visited in rooms_visited:
+                    print(f"  Paintings to see in room {sala_visited}:")
+                    for quadre_painting, time_painting in rooms_visited[sala_visited]:
+                        print(f"    - {quadre_painting.nom}, time: {round(time_painting, 2)} minutes")
+                
+                # Pasar al siguiente día
+                day += 1
+                time_spent_today = time_for_painting  # Inicia con la pintura que no cabía en el día anterior
+                paintings_to_see = [(sala, quadre, time_for_painting)]  # Empieza el nuevo día con esa pintura
+                break
+
+    # Mostrar las pinturas restantes para el último día
+    if paintings_to_see:
+        print(f"Day {day}:")
+        rooms_visited = {}
+        for sala_painting, quadre_painting, time_painting in paintings_to_see:
+            if sala_painting not in rooms_visited:
+                rooms_visited[sala_painting] = []
+            rooms_visited[sala_painting].append((quadre_painting, time_painting))
+
+        for sala_visited in rooms_visited:
+            print(f"  Paintings to see in room {sala_visited}:")
+            for quadre_painting, time_painting in rooms_visited[sala_visited]:
+                print(f"    - {quadre_painting.nom}, time: {round(time_painting, 2)} minutes")
+
+
+
+
+
+def puntuar_ruta():
+    return ask_question_numerical("Puntua la ruta del 1-5? ", 1, 5)
+
+#Init
+
+if __name__ == "__main__":
+    #file_path = "cuadros.txt"  # Cambia la ruta al archivo real
+    #quadres, autores = parse_cuadros(file_path)
+    with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
+        quadres_data = json.load(f_quadres)
+        quadres = [Quadre.from_dict(data) for data in quadres_data]
+
+    # Leer y convertir el archivo de las sales
+    with open('data/sales.json', 'r', encoding='utf-8') as f_sales:
+        sales_data = json.load(f_sales)
+        sales = {sala_id: Sala.from_dict(data) for sala_id, data in sales_data.items()}
+
+    # Leer y convertir el archivo de los autores
+    with open('data/autors.json', 'r', encoding='utf-8') as f_autores:
+        autores_data = json.load(f_autores)
+        autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
+    # Asignar las salas según el estilo de cada cuadro
+    #salas = assign_salas(quadres)
+    rutes = rutes_predeterminades(quadres)
+    visitante = gather_visitor_info()
+    knowledge_factor = show_visitor_classification(visitante)
+    ruta = recommend_route(visitante, rutes)
+    refine_route(ruta, visitante, quadres, knowledge_factor)
+    show_paintings_by_rooms(ruta, visitante, knowledge_factor)
+    puntuacio_ruta = puntuar_ruta()
+
+"""def show_paintings_by_rooms(ruta, sales, quadres, visitant, knowledge_factor):
     total_time_per_day = visitant.hores * 60 + (visitant.hores * 60 * 0.1) 
     day = 1
     remaining_time = total_time_per_day
@@ -762,35 +905,4 @@ def show_paintings_by_rooms(ruta, sales, quadres, visitant, knowledge_factor):
                 print(f"  - {p.nom}, time: {t:.2f} minutes")
 
     print(f"Total time used on day {day}: {total_time_per_day - remaining_time:.2f} minutes\n")
-    print(f"Total route time: {ruta.temps:.2f} minutes\n")
-
-def puntuar_ruta():
-    return ask_question_numerical("Puntua la ruta del 1-5? ", 1, 5)
-
-#Init
-
-if __name__ == "__main__":
-    #file_path = "cuadros.txt"  # Cambia la ruta al archivo real
-    #quadres, autores = parse_cuadros(file_path)
-    with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
-        quadres_data = json.load(f_quadres)
-        quadres = [Quadre.from_dict(data) for data in quadres_data]
-
-    # Leer y convertir el archivo de las sales
-    with open('data/sales.json', 'r', encoding='utf-8') as f_sales:
-        sales_data = json.load(f_sales)
-        sales = {sala_id: Sala.from_dict(data) for sala_id, data in sales_data.items()}
-
-    # Leer y convertir el archivo de los autores
-    with open('data/autors.json', 'r', encoding='utf-8') as f_autores:
-        autores_data = json.load(f_autores)
-        autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
-    # Asignar las salas según el estilo de cada cuadro
-    #salas = assign_salas(quadres)
-    rutes = rutes_predeterminades(quadres)
-    visitante = gather_visitor_info()
-    knowledge_factor = show_visitor_classification(visitante)
-    ruta = recommend_route(visitante, rutes)
-    refine_route(ruta, visitante, quadres, knowledge_factor)
-    show_paintings_by_rooms(ruta, sales, quadres, visitante, knowledge_factor)
-    puntuacio_ruta = puntuar_ruta()
+    print(f"Total route time: {ruta.temps:.2f} minutes\n")"""
