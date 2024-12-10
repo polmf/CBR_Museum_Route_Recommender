@@ -3,14 +3,35 @@ from recom_clips import *
 import random
 from classes import Visitant
 from generacio_instancies import assign_salas, parse_cuadros
+import numpy as np
+
+# Rangs d'edat i pesos de la distribució segons les dades
+age_ranges = [(6, 17), (18, 24), (25, 34), (35, 44), (45, 54), (55, 64), (65, 99)]
+data = [
+    3.0,  # Menors (6-17 anys), ajustat per afegir-los al total
+    8.317,  # 18-24
+    41.148,  # 25-34
+    29.914,  # 35-44
+    17.254,  # 45-54
+    14.571,  # 55-64
+    10.301   # 65+
+]
+
+# Normalització dels pesos
+weights_normalized = np.array(data) / np.sum(data)
+
+# Funció per generar una edat aleatòria segons el rang seleccionat
+def generate_age():
+    selected_range = np.random.choice(len(age_ranges), p=weights_normalized)
+    age = np.random.randint(age_ranges[selected_range][0], age_ranges[selected_range][1] + 1)
+    return age
 
 def simulate_responses():
     first_visit = random.choice([True, False])
     visitas = 0 if first_visit else random.randint(1, 10)
 
     # Restricción: Menores de 16 no pueden ir solos
-    # edat sigue una distribución normal centrada en 30 años con desviación estándar de 15 años
-    edat = int(round(random.gauss(30, 15)))
+    edat = generate_age()
 
     if edat < 16:
         companyia = random.choice(["couple", "family", "group"])
@@ -84,6 +105,9 @@ def simulate_multiple_visits(id, num_visits):
         refine_route(ruta, visitante, quadres)  # Refinamos la ruta basada en el visitante
         show_paintings_by_rooms(ruta, salas, quadres, visitante)  # Mostramos las pinturas por salas
         puntuacio_ruta = int(random.gauss(3, 1.5))  # Puntuación aleatoria de la ruta (distribución normal)
+        
+        # clip para asegurar que la puntuación esté en el rango [0, 5]
+        puntuacio_ruta = min(5, max(0, puntuacio_ruta))
         
         # Almacenamos la visita con la ruta y su puntuación
         visitas.append({
