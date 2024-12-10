@@ -1,4 +1,8 @@
+from typing import Dict, List, Tuple, Union
 import pandas as pd
+from generacio.classes import Visitant
+from transformations.functions import normalization
+from scipy.spatial.distance import cosine, hamming
 
 class Reutilizar:
     """
@@ -12,49 +16,68 @@ class Reutilizar:
     Se deberia de recomendar hasta 3 rutas diferentes para que el usuario pueda elegir la que más le guste.
     """
 
-    def __init__(self, user_to_recommend, top_5_similar_users):
+    def __init__(self, user_to_recommend: Visitant, top_10_similar_cases: pd.DataFrame):
         self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
+        self.top_10_similar_cases = top_10_similar_cases
         self.user_to_recommend = user_to_recommend
-        self.top_5_similar_users = top_5_similar_users
 
-    def get_route_more_repeated_from_similar_cases(self):
-        """
-        Obtiene la ruta más repetida entre los casos similares.
-        """
-        routes = []
-        for user_id, _ in self.top_5_similar_users:
-            user_data = self._base_de_casos[self._base_de_casos['visitante_id'] == user_id]
+    def get_route_from_similar_cases(
+        self,
+        top_10_similar_cases: List[Tuple[str, float]]
+        ):
+
+        routes = {}
+        for index, _ in top_10_similar_cases:
+            user_data = self._base_de_casos.iloc[index]
             user_routes = user_data['ruta']
-            routes.extend(user_routes)
-        # Calcular la ruta más repetida
-        route_counts = {}
-        for route in routes:
-            if route in route_counts:
-                route_counts[route] += 1
+            
+            ruta_info = {
+                'quadres': user_data['ruta_quadres'],
+                'temps': user_data['ruta_temps'],
+                'puntuacio': user_data['puntuacio_ruta']
+            }
+            
+            if user_routes in routes:
+                routes[user_routes].append(ruta_info)
             else:
-                route_counts[route] = 1
+                routes[user_routes] = [ruta_info]
 
-        most_common_route = max(route_counts, key=route_counts.get)
-        return most_common_route
+        return routes
     
-    def adjust_route_to_user_preferences(self, route):
+    def adapt_route_to_user_preferences(
+        self,
+        route: Dict[str, Union[str, int]]
+        ):
         """
         Ajusta la ruta recomendada a las preferencias del nuevo usuario.
         """
         # Ajustar la duración de la ruta
-        """if route.get_temps() > self.user_to_recommend.get_hores():
-            route.get_temps() = self.user_to_recommend.get_hores()"""
+        temps_user_to_recommend = self.user_to_recommend.hores * self.user_to_recommend.dies * 60
+        temps_ruta = route['temps']
         
-        # Ajustar la dificultad de la ruta
-        """if route.difficulty > self.user_to_recommend.max_difficulty:
-            route.difficulty = self.user_to_recommend.max_difficulty"""
+        if temps_ruta > temps_user_to_recommend:
+            # traiem quadres menys rellevants de la ruta fins que la duració sigui menor
+            pass
+        else:
+            # afegim quadres rellevants de la ruta fins que la duració sigui major
+            pass
+
+        if route['puntuacio'] < 3:
+            pass
         
-        # Otros ajustes basados en las preferencias del usuario
-        # ...
-        routes = []
-        for user_id, _ in self.top_5_similar_users:
-            user_data = self._base_de_casos[self._base_de_casos['visitante_id'] == user_id]
-            user_routes = [user_data['ruta'], user_data['ruta_quadres'], user_data['ruta_temps']]
-            routes.extend(user_routes)
-        
-        return routes 
+        return route
+    
+    def recommend_routes(self):
+        """
+        Recomienda hasta 3 rutas diferentes para que el usuario pueda elegir la que más le guste.
+        """
+        routes = self.get_route_from_similar_cases(self.top_10_similar_cases)
+        routes = [
+            self.adapt_route_to_user_preferences(route) 
+            for route_list in routes.values() 
+            for route in route_list
+        ]
+
+        top_3_routes = sorted(routes, key=lambda x: x['puntuacio'], reverse=True)[:3]
+
+        return top_3_routes

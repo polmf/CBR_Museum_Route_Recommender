@@ -1,4 +1,5 @@
 import pandas as pd
+from transformations.functions import normalization
 
 class Retener:
     """
@@ -6,26 +7,42 @@ class Retener:
     para poder usarlos en el futuro.
     """
 
-    def __init__(self, user_to_recommend, feedback):
+    def __init__(self, user_to_recommend, feedback, recommended_route):
         self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
-        self.add_feedback(user_to_recommend, feedback)
-        self.save_case(user_to_recommend)
+        self._base_de_casos_normalized = pd.read_csv("data/base_de_casos_normalized.csv")
+        self.user_to_recommend = self.user_to_df(user_to_recommend, recommended_route, feedback)
+        self.user_to_recommend_normalized = normalization(user_to_recommend, self._base_de_casos)
 
-    def add_feedback(self, user_to_recommend, feedback):
+    def user_to_df(self, user_to_recommend, recommended_route, feedback):
         """
-        Añade el feedback del usuario a la base de casos.
+        Convertir el objeto user_to_recommend a un DataFrame.
         """
-        user_to_recommend.feedback = feedback
+        user_to_recommend = {
+            'visitante_id': id,
+            'visitant_edat': user_to_recommend.edat,
+            'visitant_visites': user_to_recommend.visites,
+            'visitant_dies': user_to_recommend.dies,
+            'visitant_hores': user_to_recommend.hores,
+            'visitant_companyia': user_to_recommend.companyia,
+            'visitant_estudis': user_to_recommend.estudis,
+            'visitant_coneixement': user_to_recommend.coneixements,
+            'visitant_quizz': user_to_recommend.quizz,
+            'visitant_interessos_autor': user_to_recommend.interessos_autor,
+            'visitant_interessos_estils': user_to_recommend.interessos_estils,
+            'ruta': recommended_route.nom,
+            'ruta_quadres': recommended_route.quadres,
+            'ruta_temps' : recommended_route.temps,
+            'puntuacio_ruta': feedback
+        }
 
-    def save_case(self, case):
+        return pd.DataFrame(user_to_recommend)
+    
+    def save_user_to_recommend(self):
         """
-        Guarda un nuevo caso en la base de casos.
+        Guardar el nuevo usuario en la base de datos.
         """
-        case_data = vars(case) 
+        self._base_de_casos = pd.concat([self._base_de_casos, self.user_to_recommend])
+        self._base_de_casos.to_csv("data/base_de_casos.csv", index=False)
 
-        self._base_de_casos = pd.concat(
-            [self._base_de_casos, pd.DataFrame([case_data])], 
-            ignore_index=True
-        )
-
-        #self._base_de_casos.to_csv("data/base_de_dades.csv", index=False)
+        self._base_de_casos_normalized = pd.concat([self._base_de_casos_normalized, self.user_to_recommend_normalized])
+        self._base_de_casos_normalized.to_csv("data/base_de_casos_normalized.csv", index=False)
