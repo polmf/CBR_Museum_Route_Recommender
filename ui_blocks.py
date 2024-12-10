@@ -7,7 +7,7 @@ def render_block(block):
         st.header("Block 1: General Information")
         first_visit = ask_yes_or_no("Is this your first time visiting the museum?")
         visitas = 0 if first_visit else ask_question_numerical("How many times have you been here before?", 1, 10)
-        companyia = ask_question("Who are you visiting the museum with?", ["Alone", "Couple", "Family", "Group"])
+        companyia = ask_question("Who are you visiting the museum with?", ["Alone", "Group"])
         dies = ask_question_numerical("How many days are you planning on coming to the museum?", 1, 10)
         hores = ask_question_numerical("How many hours do you want to spend each day?", 1, 12)
 

@@ -1,6 +1,6 @@
-from classes import Visitant
-from generacio_instancies import *
-
+from classes import *
+#from generacio_instancies import *
+import json
 class Ruta:
     def __init__(self, nom, quadres, temps=0.0):
         self.nom = nom
@@ -137,7 +137,7 @@ def primera_visita(first_visit):
     return ask_question_numerical("How many times have you been here before? (1-10) ", 1, 10)
 
 def amb_qui_vens():
-    return ask_question("Who are you visiting the museum with? (alone/group) ", ["alone", "couple", "family", "group"])
+    return ask_question("Who are you visiting the museum with? (alone/group) ", ["alone", "group"])
 
 def dies_visita():
     return ask_question_numerical("How many days are you planning on coming to the museum (1-10)? ", 1, 10)
@@ -451,12 +451,10 @@ def recommend_route(visitante, rutes):
 #refinament
 def calculate_observation_time(painting):
     complexity = painting.complexitat
-    height = painting.alçada
-    width = painting.amplada
+    dim_cm2 = painting.dim_cm2
     relevance = painting.rellevancia
-
-    area = height * width
-    base_time = 4.0 if area < 2500 else 8.0
+    
+    base_time = 4.0 if dim_cm2 < 2500 else 8.0
 
     complexity_factor = (
         1.1 if complexity <= 1 else
@@ -597,14 +595,26 @@ def puntuar_ruta():
 #Init
 
 if __name__ == "__main__":
-    file_path = "cuadros.txt"  # Cambia la ruta al archivo real
-    quadres, autores = parse_cuadros(file_path)
+    #file_path = "cuadros.txt"  # Cambia la ruta al archivo real
+    #quadres, autores = parse_cuadros(file_path)
+    with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
+        quadres_data = json.load(f_quadres)
+        quadres = [Quadre.from_dict(data) for data in quadres_data]
 
+    # Leer y convertir el archivo de las sales
+    with open('data/sales.json', 'r', encoding='utf-8') as f_sales:
+        sales_data = json.load(f_sales)
+        sales = {sala_id: Sala.from_dict(data) for sala_id, data in sales_data.items()}
+
+    # Leer y convertir el archivo de los autores
+    with open('data/autors.json', 'r', encoding='utf-8') as f_autores:
+        autores_data = json.load(f_autores)
+        autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
     # Asignar las salas según el estilo de cada cuadro
-    salas = assign_salas(quadres)
+    #salas = assign_salas(quadres)
     visitante = gather_visitor_info()
     show_visitor_classification(visitante)
     ruta = recommend_route(visitante, rutes)
     refine_route(ruta, visitante, quadres)
-    show_paintings_by_rooms(ruta, salas, quadres, visitante)
+    show_paintings_by_rooms(ruta, sales, quadres, visitante)
     puntuacio_ruta = puntuar_ruta()
