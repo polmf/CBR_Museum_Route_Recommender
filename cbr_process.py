@@ -20,16 +20,23 @@ def handle_cbr_process():
     )
 
     recuperar = Recuperar(user_to_recommend)
-    top_5_similar_users = recuperar.recommend_similar_users(user_to_recommend)
-    reutilizar = Reutilizar(user_to_recommend, top_5_similar_users)
-    route_selected = reutilizar.get_route_more_repeated_from_similar_cases()
+    top_10_similar_users = recuperar.recommend_10_similar_users()
+    
+    reutilizar = Reutilizar(user_to_recommend, top_10_similar_users)
+    top_3_routes_recommended = reutilizar.recommend_routes()
 
-    revisar = Revisar(route_selected)
-    ruta = revisar.print_routes()
     st.write("Estas son las rutas recomendadas para ti:")
-    st.write(ruta)
+    st.write(top_3_routes_recommended)
 
-    feedback = st.slider("Introduce una puntuación del 1 al 5 a la ruta recomendada", 1, 5)
+    # que el usuario escoja una ruta
+    st.write("Por favor, selecciona una de las rutas recomendadas.")
+    route_selected = st.selectbox("", top_3_routes_recommended)
+
+    revisar = Revisar()
+    feedback = revisar.collect_feedback()
+
     if st.button("Enviar Feedback"):
-        retener = Retener(user_to_recommend, feedback)
+        retener = Retener(user_to_recommend, feedback, route_selected)
         st.success("¡Gracias por tu feedback! Se ha registrado correctamente.")
+
+handle_cbr_process()
