@@ -16,18 +16,21 @@ class Reutilizar:
     Se deberia de recomendar hasta 3 rutas diferentes para que el usuario pueda elegir la que más le guste.
     """
 
-    def __init__(self, user_to_recommend: Visitant, top_10_similar_cases: pd.DataFrame):
+    def __init__(self, user_to_recommend: Visitant, top_3_similar_cases: pd.DataFrame):
         self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
-        self.top_10_similar_cases = top_10_similar_cases
+        # TODO
+        self._cuadros = pd.read_csv("data/cuadros.txt")
+
+        self.top_3_similar_cases = top_3_similar_cases
         self.user_to_recommend = user_to_recommend
 
     def get_route_from_similar_cases(
         self,
-        top_10_similar_cases: List[Tuple[str, float]]
+        top_3_similar_cases: List[Tuple[str, float]]
         ):
 
         routes = {}
-        for index, _ in top_10_similar_cases:
+        for index, _ in top_3_similar_cases:
             user_data = self._base_de_casos.iloc[index]
             user_routes = user_data['ruta']
             
@@ -44,25 +47,46 @@ class Reutilizar:
 
         return routes
     
+    def add_artist(artistas, route):
+        if artistas 
+    
     def adapt_route_to_user_preferences(
         self,
         route: Dict[str, Union[str, int]]
         ):
+
+        print("Ruta:", route)
+        print()
+        print("----"*30)
+        print()
         """
         Ajusta la ruta recomendada a las preferencias del nuevo usuario.
         """
+        # Ajustar los artistas y estilos de la ruta 
+    
+        # Si en la base de datos hay cuadros de artistas que le gustan al usuario, añadirlos a la ruta
+        artistas = self.user_to_recommend.interessos_autor
+
+
+        # Si en la base de datos hay cuadros de estilos que le gustan al usuario, añadirlos a la ruta
+
+
+
         # Ajustar la duración de la ruta
         temps_user_to_recommend = self.user_to_recommend.hores * self.user_to_recommend.dies * 60
         temps_ruta = route['temps']
         
         if temps_ruta > temps_user_to_recommend:
             # traiem quadres menys rellevants de la ruta fins que la duració sigui menor
+
             pass
         else:
             # afegim quadres rellevants de la ruta fins que la duració sigui major
+
             pass
 
         if route['puntuacio'] < 3:
+            # SI la puntuació de la ruta és baixa -> fer algo
             pass
         
         return route
@@ -71,13 +95,14 @@ class Reutilizar:
         """
         Recomienda hasta 3 rutas diferentes para que el usuario pueda elegir la que más le guste.
         """
-        routes = self.get_route_from_similar_cases(self.top_10_similar_cases)
+        routes = self.get_route_from_similar_cases(self.top_3_similar_cases)
+        print("Rutes:", routes)
         routes = [
             self.adapt_route_to_user_preferences(route) 
             for route_list in routes.values() 
             for route in route_list
         ]
 
-        top_3_routes = sorted(routes, key=lambda x: x['puntuacio'], reverse=True)[:3]
+        top_3_routes = sorted(routes, key=lambda x: x['NOVA PUNTUACIO'], reverse=True)[:3] # TO DO
 
         return top_3_routes
