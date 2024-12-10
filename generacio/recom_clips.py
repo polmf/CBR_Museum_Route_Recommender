@@ -1,9 +1,10 @@
 from classes import *
-#from generacio_instancies import *
+import random
 import json
 class Ruta:
-    def __init__(self, nom, quadres, temps=0.0):
+    def __init__(self, nom, instancies, quadres = [], temps=0.0):
         self.nom = nom
+        self.instancies = instancies
         self.quadres = quadres
         self.temps = temps
 
@@ -16,68 +17,196 @@ class Ruta:
     def get_temps(self):
         return self.temps
 
-rutes = [
-    Ruta(
+def calculate_observation_time_pred(painting):
+    complexity = painting.complexitat
+    dim_cm2 = painting.dim_cm2
+    relevance = painting.rellevancia
+    
+    
+    base_time = 1.0 if dim_cm2 < 5007 else 2.0
+
+    complexity_factor = (
+        1.1 if complexity <= 1 else
+        1.2 if complexity <= 2 else
+        1.3 if complexity <= 3 else
+        1.4 if complexity <= 4 else
+        1.5
+    )
+
+    relevance_factor = (
+        1.1 if relevance <= 1 else
+        1.2 if relevance <= 2 else
+        1.3 if relevance <= 3 else
+        1.4 if relevance <= 4 else
+        1.5
+    )
+
+    total_time = (base_time * complexity_factor * relevance_factor)
+    return total_time
+
+import random
+
+def rutes_predeterminades(quadres):
+    rutes = []
+    quadres_rellevants = [quadre for quadre in quadres if quadre.rellevancia >= 8]
+    quadres_poc_rellevants = [quadre for quadre in quadres if quadre.rellevancia <= 3]
+    quadres_poc_mig_rellevants = [quadre for quadre in quadres if quadre.rellevancia < 3 and quadre.rellevancia <= 5.5]
+    quadres_mig_rellevants = [quadre for quadre in quadres if quadre.rellevancia < 5.5 and quadre.rellevancia <= 7.9]
+    quadres_complexitat = [quadre for quadre in quadres if quadre.complexitat >= 8]
+    quadres_poc_complexitat = [quadre for quadre in quadres if quadre.complexitat <= 3]
+    quadres_poc_mig_complexitat = [quadre for quadre in quadres if quadre.complexitat < 3 and quadre.complexitat <= 5.5]
+    quadres_mig_complexitat = [quadre for quadre in quadres if quadre.complexitat < 5.5 and quadre.complexitat <= 7.9]
+    
+    # Función para seleccionar cuadros sin repetir dentro de la misma ruta
+    def seleccionar_quadres(quadres_list, num_quadres, cuadros_seleccionados_ruta):
+        disponibles = [quadre for quadre in quadres_list if quadre.nom not in cuadros_seleccionados_ruta]
+        seleccionados = random.sample(disponibles, min(num_quadres, len(disponibles)))
+        cuadros_seleccionados_ruta.update(quadre.nom for quadre in seleccionados)
+        return seleccionados
+    
+    # Ruta 1
+    cuadros_seleccionados_ruta1 = set()  # Conjunto para la ruta 1
+    ruta1 = Ruta(
         nom="ruta1",
-        quadres=["The_Horse_Fair", "Un_monaguillo_solfeando", "Adoración_de_los_Reyes_Magos", "La_Mona_Lisa"],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 15, cuadros_seleccionados_ruta1) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta1),
+    )
+    ruta1.quadres = [quadre.nom for quadre in ruta1.instancies]
+    ruta1.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta1.instancies)
+    rutes.append(ruta1)
+
+    # Ruta 2
+    cuadros_seleccionados_ruta2 = set()  # Conjunto para la ruta 2
+    ruta2 = Ruta(
         nom="ruta2",
-        quadres=[
-            "Samson_and_Delilah", "Sol_de_sequía_en_julio", "The_Virgin_of_the_Rocks", "Orión_en_invierno",
-            "City_of_the_Future", "Abstract_Minds", "Celestial_Explorations", "La_Virgen_con_el_Niño",
-            "Retrato_de_Antonio_Anselmi", "Identidad"
-        ],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 15, cuadros_seleccionados_ruta2) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta2),
+    )
+    ruta2.quadres = [quadre.nom for quadre in ruta2.instancies]
+    ruta2.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta2.instancies)
+    rutes.append(ruta2)
+
+    # Ruta 3
+    cuadros_seleccionados_ruta3 = set()  # Conjunto para la ruta 3
+    ruta3 = Ruta(
         nom="ruta3",
-        quadres=[
-            "Retrato_de_Antonio_Anselmi", "El_jardi_de_les_delicies", "La_zarina_Catalina_II",
-            "Self_Portrait_at_the_Age_of_34"
-        ],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta3) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta3) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta3),
+    )
+    ruta3.quadres = [quadre.nom for quadre in ruta3.instancies]
+    ruta3.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta3.instancies)
+    rutes.append(ruta3)
+
+    # Ruta 4
+    cuadros_seleccionados_ruta4 = set()  # Conjunto para la ruta 4
+    ruta4 = Ruta(
         nom="ruta4",
-        quadres=[
-            "Un_monaguillo_solfeando", "Autorretrato", "El_Gran_Capitán,_recorriendo_el_campo_de_la_batalla_de_Ceriñola",
-            "El_pintor_Carlos_Luis_de_Ribera", "Francisco_Pacheco", "La_Virgen_con_el_Niño"
-        ],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta4) + seleccionar_quadres(quadres_complexitat, 5, cuadros_seleccionados_ruta4),
+    )
+    ruta4.quadres = [quadre.nom for quadre in ruta4.instancies]
+    ruta4.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta4.instancies)
+    rutes.append(ruta4)
+
+    # Ruta 5
+    cuadros_seleccionados_ruta5 = set()  # Conjunto para la ruta 5
+    ruta5 = Ruta(
         nom="ruta5",
-        quadres=[
-            "Abstract_Minds", "City_of_the_Future", "Celestial_Explorations", "Symphony_of_Lights",
-            "Digital_Rebirth", "Identidad", "Orión_en_invierno", "La_zarina_Catalina_II"
-        ],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 25, cuadros_seleccionados_ruta5) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta5) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta5),
+    )
+    ruta5.quadres = [quadre.nom for quadre in ruta5.instancies]
+    ruta5.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta5.instancies)
+    rutes.append(ruta5)
+
+    # Ruta 6
+    cuadros_seleccionados_ruta6 = set()  # Conjunto para la ruta 6
+    ruta6 = Ruta(
         nom="ruta6",
-        quadres=[
-            "The_Horse_Fair", "Samson_and_Delilah", "El_naixement_de_Venus", "Self_Portrait_at_the_Age_of_34",
-            "Symphony_of_Lights", "Digital_Rebirth"
-        ],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 20, cuadros_seleccionados_ruta6) + seleccionar_quadres(quadres_mig_rellevants, 5, cuadros_seleccionados_ruta6) + seleccionar_quadres(quadres_poc_complexitat, 10, cuadros_seleccionados_ruta6) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta6),
+    )
+    ruta6.quadres = [quadre.nom for quadre in ruta6.instancies]
+    ruta6.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta6.instancies)
+    rutes.append(ruta6)
+
+    # Ruta 7
+    cuadros_seleccionados_ruta7 = set()  # Conjunto para la ruta 7
+    ruta7 = Ruta(
         nom="ruta7",
-        quadres=[
-            "La_Mona_Lisa", "Adoración_de_los_Reyes_Magos", "La_ronda_de_nit", "Celestial_Explorations"
-        ],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta7) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta7),
+    )
+    ruta7.quadres = [quadre.nom for quadre in ruta7.instancies]
+    ruta7.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta7.instancies)
+    rutes.append(ruta7)
+
+    # Ruta 8
+    cuadros_seleccionados_ruta8 = set()  # Conjunto para la ruta 8
+    ruta8 = Ruta(
         nom="ruta8",
-        quadres=[
-            "The_Virgin_of_the_Rocks", "The_Horse_Fair", "Sol_de_sequía_en_julio", "Ciervo_en_los_montes_Adirondacks",
-            "La_cantante", "Orión_en_invierno"
-        ],
-    ),
-    Ruta(
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta8) + seleccionar_quadres(quadres_complexitat, 5, cuadros_seleccionados_ruta8),
+    )
+    ruta8.quadres = [quadre.nom for quadre in ruta8.instancies]
+    ruta8.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta8.instancies)
+    rutes.append(ruta8)
+
+    # Ruta 9
+    cuadros_seleccionados_ruta9 = set()  # Conjunto para la ruta 9
+    ruta9 = Ruta(
         nom="ruta9",
-        quadres=[
-            "Symphony_of_Lights", "Celestial_Explorations", "Digital_Rebirth", "Samson_and_Delilah",
-            "La_Mona_Lisa", "Adoración_de_los_Reyes_Magos", "La_ronda_de_nit", "Celestial_Explorations"
-        ],
-    ),
-]
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta9) + seleccionar_quadres(quadres_complexitat, 15, cuadros_seleccionados_ruta9),
+    )
+    ruta9.quadres = [quadre.nom for quadre in ruta9.instancies]
+    ruta9.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta9.instancies)
+    rutes.append(ruta9)
+
+    # Ruta 10
+    cuadros_seleccionados_ruta10 = set()  # Conjunto para la ruta 10
+    ruta10 = Ruta(
+        nom="ruta10",
+        instancies=seleccionar_quadres(quadres_rellevants, 30, cuadros_seleccionados_ruta10) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta10) + seleccionar_quadres(quadres_poc_mig_complexitat, 10, cuadros_seleccionados_ruta10) + seleccionar_quadres(quadres_poc_complexitat, 15, cuadros_seleccionados_ruta10),
+    )
+    ruta10.quadres = [quadre.nom for quadre in ruta10.instancies]
+    ruta10.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta10.instancies)
+    rutes.append(ruta10)
+
+    # Ruta 11
+    cuadros_seleccionados_ruta11 = set()  # Conjunto para la ruta 11
+    ruta11 = Ruta(
+        nom="ruta11",
+        instancies=seleccionar_quadres(quadres_rellevants, 25, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_mig_rellevants, 10, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_poc_mig_rellevants, 5, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_poc_complexitat, 15, cuadros_seleccionados_ruta11)  + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta11) + seleccionar_quadres(quadres_mig_complexitat, 5, cuadros_seleccionados_ruta11),
+    )
+    ruta11.quadres = [quadre.nom for quadre in ruta11.instancies]
+    ruta11.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta11.instancies)
+    rutes.append(ruta11)
+
+    # Ruta 12
+    cuadros_seleccionados_ruta12 = set()  # Conjunto para la ruta 12
+    ruta12 = Ruta(
+        nom="ruta12",
+        instancies=seleccionar_quadres(quadres_rellevants, 20, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_poc_mig_rellevants, 10, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_poc_mig_complexitat, 20, cuadros_seleccionados_ruta12) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta12),
+    )
+    ruta12.quadres = [quadre.nom for quadre in ruta12.instancies]
+    ruta12.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta12.instancies)
+    rutes.append(ruta12)
+
+    # Ruta 13
+    cuadros_seleccionados_ruta13 = set()  # Conjunto para la ruta 13
+    ruta13 = Ruta(
+        nom="ruta13",
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_poc_mig_rellevants, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_poc_rellevants, 5, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_poc_mig_complexitat, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta13) + seleccionar_quadres(quadres_complexitat, 10, cuadros_seleccionados_ruta13),
+    )
+    ruta13.quadres = [quadre.nom for quadre in ruta13.instancies]
+    ruta13.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta13.instancies)
+    rutes.append(ruta13)
+
+    # Ruta 14
+    cuadros_seleccionados_ruta14 = set()  # Conjunto para la ruta 14
+    ruta14 = Ruta(
+        nom="ruta14",
+        instancies=seleccionar_quadres(quadres_rellevants, 10, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_mig_rellevants, 15, cuadros_seleccionados_ruta14)  + seleccionar_quadres(quadres_poc_mig_rellevants, 15, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_poc_rellevants, 5, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_mig_complexitat, 10, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_mig_complexitat, 15, cuadros_seleccionados_ruta14) + seleccionar_quadres(quadres_complexitat, 20, cuadros_seleccionados_ruta14),
+    )
+    ruta14.quadres = [quadre.nom for quadre in ruta14.instancies]
+    ruta14.temps = sum(calculate_observation_time_pred(quadre) for quadre in ruta14.instancies)
+    rutes.append(ruta14)
+
+    return rutes
+
+
 
 def yes_or_no(question):
     answer = input(question).strip().lower()
@@ -335,105 +464,149 @@ def show_visitor_classification(visitante):
     print(f"Visitor's knowledge classification: {category_knowledge}")
     print(f"Total Knowledge Score: {total_score}")
     
+    knowledge_factor = (
+        1. if category_knowledge <= "Novice" else
+        1.1 if category_knowledge <= "Beginner" else
+        1.2 if category_knowledge <= "Intermediate" else
+        1.3 if category_knowledge <= "Advanced" else
+        1.4
+    )
+    return knowledge_factor
+    
 #Matching
-def calculate_route_scores(visitante, category_museum, category_age, category_knowledge, rutes):
-    scores = {}
+def calculate_route_scores(visitant, category_museum, category_age, category_knowledge, rutes):
+    
+    scores = {}  # Diccionari per guardar les puntuacions de cada ruta
 
-    # Ruta 1
+    # Ruta 1: Experiència baixa, ideal per a nens i novells
     scores['ruta1'] = 0
-    if visitante.visites == 0:  # Primera visita
-        scores['ruta1'] += 1
+    if visitant.visites == 0:  # Primera visita
+        scores['ruta1'] += 2
     if category_museum == "Novice":
-        scores['ruta1'] += 1
-    if category_knowledge == "Novice":
-        scores['ruta1'] += 1
-    if visitante.coneixements == "no":
-        scores['ruta1'] += 1
+        scores['ruta1'] += 2
     if category_age == "Child":
-        scores['ruta1'] += 1
+        scores['ruta1'] += 3
+    if category_knowledge == "Novice":
+        scores['ruta1'] += 2
 
-    # Ruta 2
+    # Ruta 2: Experiència mitjana-baixa
     scores['ruta2'] = 0
-    if category_museum in ["Intermediate", "Beginner"]:
-        scores['ruta2'] += 1
-    if category_knowledge in ["Beginner", "Intermediate", "Advanced"]:
+    if category_museum in ["Beginner", "Intermediate"]:
         scores['ruta2'] += 2
-    if visitante.dies > 1:
+    if category_knowledge in ["Beginner", "Intermediate"]:
+        scores['ruta2'] += 2
+    if visitant.dies > 1:  # Dies mitjans
         scores['ruta2'] += 2
 
-    # Ruta 3
+    # Ruta 3: Experiència mitjana-alta, pensada per a joves amb cert coneixement
     scores['ruta3'] = 0
     if category_age == "Teenager":
-        scores['ruta3'] += 1
-    if visitante.coneixements == "yes":
+        scores['ruta3'] += 3
+    if visitant.coneixements == "yes":
         scores['ruta3'] += 2
-    if visitante.visites >= 2:
+    if visitant.visites >= 2:
         scores['ruta3'] += 2
 
-    # Ruta 4
+    # Ruta 4: Experiència alta, ideal per a adults sols i coneixedors
     scores['ruta4'] = 0
-    if visitante.companyia == "alone":
-        scores['ruta4'] += 1
-    if category_knowledge in ["Intermediate", "Advanced"]:
+    if visitant.companyia == "alone":
         scores['ruta4'] += 2
-    if any(style in ["modernisme", "romanticisme", "barroc", "renaixement", "realisme"] for style in visitante.interessos_estils):
+    if category_knowledge in ["Intermediate", "Advanced", "Expert"]:
+        scores['ruta4'] += 3
+    if any(style in ["modernisme", "barroc", "renaixement", "realisme"] for style in visitant.interessos_estils):
         scores['ruta4'] += 2
 
-    # Ruta 5
+    # Ruta 5: Experiència baixa amb dies mitjans i nens
     scores['ruta5'] = 0
-    if category_age == "Adult":
-        scores['ruta5'] += 1
-    if visitante.visites >= 3:
-        scores['ruta5'] += 1
-    if category_knowledge == "Expert":
+    if category_age == "Child":
+        scores['ruta5'] += 3
+    if visitant.dies > 1:
         scores['ruta5'] += 2
-    if visitante.companyia == "group":
-        scores['ruta5'] += 1
+    if category_museum == "Novice":
+        scores['ruta5'] += 2
 
-    # Ruta 6
+    # Ruta 6: Experiència baixa sense nens amb dies mitjans
     scores['ruta6'] = 0
-    if visitante.coneixements == "yes":
+    if category_age in ["Adult", "Teenager"]:
         scores['ruta6'] += 2
-    if category_knowledge in ["Advanced", "Expert"]:
+    if visitant.dies == 2:
         scores['ruta6'] += 2
-    if visitante.dies == 1:
-        scores['ruta6'] += 1
+    if visitant.coneixements == "no":
+        scores['ruta6'] += 2
 
-    # Ruta 7
+    # Ruta 7: Experiència mitjana-baixa amb dies mitjans
     scores['ruta7'] = 0
-    if visitante.companyia == "group":
+    if visitant.companyia == "group":
         scores['ruta7'] += 2
     if category_age == "Teenager":
         scores['ruta7'] += 2
-    if visitante.dies == 1:
-        scores['ruta7'] += 1
+    if visitant.dies == 2:
+        scores['ruta7'] += 2
 
-    # Ruta 8
+    # Ruta 8: Experiència mitjana amb dies mitjans
     scores['ruta8'] = 0
     if category_age == "Senior":
         scores['ruta8'] += 2
     if category_knowledge in ["Intermediate", "Advanced"]:
         scores['ruta8'] += 2
-    if visitante.visites >= 2:
-        scores['ruta8'] += 1
+    if visitant.visites >= 3:
+        scores['ruta8'] += 2
 
-    # Ruta 9
+    # Ruta 9: Experiència alta amb dies mitjans
     scores['ruta9'] = 0
-    if visitante.companyia == "group":
+    if visitant.companyia == "group":
+        scores['ruta9'] += 3
+    if visitant.dies >= 2:
         scores['ruta9'] += 2
-    if category_age == "Teenager":
-        scores['ruta9'] += 2
-    if visitante.dies > 1:
-        scores['ruta9'] += 1
+    if category_knowledge in ["Advanced", "Expert"]:
+        scores['ruta9'] += 3
 
-    # Selección final
-    final_route = max(scores, key=scores.get)
-    print(f"Based on your preferences and characteristics, the recommended route is: {final_route}")
+    # Ruta 10: Experiència baixa amb dies alts i nens
+    scores['ruta10'] = 0
+    if category_age == "Child":
+        scores['ruta10'] += 3
+    if visitant.dies > 3:
+        scores['ruta10'] += 2
+    if visitant.visites == 0:
+        scores['ruta10'] += 2
+
+    # Ruta 11: Experiència baixa amb dies alts sense nens
+    scores['ruta11'] = 0
+    if category_age == "Adult":
+        scores['ruta11'] += 2
+    if visitant.dies > 3:
+        scores['ruta11'] += 2
+
+    # Ruta 12: Experiència mitjana-baixa amb dies alts
+    scores['ruta12'] = 0
+    if visitant.dies > 3:
+        scores['ruta12'] += 3
+    if visitant.coneixements == "yes":
+        scores['ruta12'] += 2
+
+    # Ruta 13: Experiència mitjana amb dies alts
+    scores['ruta13'] = 0
+    if category_knowledge in ["Intermediate", "Advanced"]:
+        scores['ruta13'] += 3
+    if visitant.dies > 3:
+        scores['ruta13'] += 2
+
+    # Ruta 14: Experiència alta amb moltes dies
+    scores['ruta14'] = 0
+    if category_knowledge in ["Advanced", "Expert"]:
+        scores['ruta14'] += 3
+    if visitant.dies > 4:
+        scores['ruta14'] += 3
+    if visitant.companyia == "alone":
+        scores['ruta14'] += 2
+
+    # Selecció final de la millor ruta
+    final_route_name = max(scores, key=scores.get)
+    print(f"La ruta recomanada segons les teves preferències és: {final_route_name}")
+
     for ruta in rutes:
-        if ruta.nom == final_route:
+        if ruta.nom == final_route_name:
             return ruta
-
-
 
 # Función de integración con la clase Visitant y clasificaciones
 
@@ -449,12 +622,13 @@ def recommend_route(visitante, rutes):
     return final_route
 
 #refinament
-def calculate_observation_time(painting):
+def calculate_observation_time(painting, knowledge_factor):
     complexity = painting.complexitat
     dim_cm2 = painting.dim_cm2
     relevance = painting.rellevancia
     
-    base_time = 4.0 if dim_cm2 < 2500 else 8.0
+    
+    base_time = 1.0 if dim_cm2 < 5007 else 2.0
 
     complexity_factor = (
         1.1 if complexity <= 1 else
@@ -471,54 +645,55 @@ def calculate_observation_time(painting):
         1.4 if relevance <= 4 else
         1.5
     )
+    
 
-    total_time = base_time * complexity_factor * relevance_factor
+    total_time = (base_time * complexity_factor * relevance_factor * knowledge_factor)
     return total_time
 
 
-def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_author, visitant):
+def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_author, visitant, knowledge_factor):
     max_time = visitant.hores * 60 * visitant.dies
 
     for painting in new_paintings_by_style:
-        time_for_painting = calculate_observation_time(painting)
+        time_for_painting = calculate_observation_time(painting, knowledge_factor)
         if painting.name not in route.quadres and route.time + time_for_painting < max_time:
             route.quadres.append(painting.nom)
             route.time += time_for_painting
 
     for painting in new_paintings_by_author:
-        time_for_painting = calculate_observation_time(painting)
+        time_for_painting = calculate_observation_time(painting, knowledge_factor)
         if painting.name not in route.quadres and route.author_intereststime + time_for_painting < max_time:
             route.quadres.append(painting.nom)
             route.time += time_for_painting
 
 
-def remove_paintings_from_route(route, paintings_of_interest, visitant, quadres):
+def remove_paintings_from_route(route, paintings_of_interest, visitant, quadres, knowledge_factor):
     max_time = visitant.hores * 60 * visitant.dies
     
     for painting in quadres:
         if route.temps > max_time and painting.nom not in paintings_of_interest and painting in route.quadres:
-            time_for_painting = calculate_observation_time(painting)
+            time_for_painting = calculate_observation_time(painting, knowledge_factor)
             route.quadres.remove(painting.nom)
             route.temps -= time_for_painting
 
 
 
-def fill_remaining_time(route, visitant, quadres):
+def fill_remaining_time(route, visitant, quadres, knowledge_factor):
     
     max_time = visitant.hores * 60 * visitant.dies
     
     for painting in quadres:
         if route.temps < max_time and painting.nom not in route.quadres:
-            time_for_painting = calculate_observation_time(painting)
+            time_for_painting = calculate_observation_time(painting, knowledge_factor)
             route.quadres.append(painting.nom)
             route.temps += time_for_painting
     
 
-def refine_route(route, visitante, all_paintings):
+def refine_route(route, visitante, all_paintings, knowledge_factor):
     """
     Refine the recommended route by adding or removing paintings based on visitor preferences and time constraints.
     """
-
+    route.temps = route.temps * knowledge_factor
     # Find paintings by style and author interests
     paintings_by_style = [quadre.nom for quadre in all_paintings if quadre.estil==visitante.interessos_estils ]
     paintings_by_author = [quadre.nom for quadre in all_paintings if quadre.autor==visitante.interessos_autor ]
@@ -528,26 +703,26 @@ def refine_route(route, visitante, all_paintings):
         if ruta.nom == route:
             add_paintings_to_route(
                 ruta, paintings_by_style, paintings_by_author,
-                visitante
+                visitante, knowledge_factor
             )
 
     # Remove paintings if the route exceeds time constraints
         if ruta.temps >= visitante.dies * visitante.hores *60:
             remove_paintings_from_route(
                 ruta, paintings_by_style+ paintings_by_author,
-                visitante, all_paintings
+                visitante, all_paintings, knowledge_factor
             )
 
         if ruta.temps < visitante.dies * visitante.hores *60:
             # Fill remaining time with other paintings
             fill_remaining_time(
-                ruta, visitante, all_paintings
+                ruta, visitante, all_paintings, knowledge_factor
             )
 
 #Print final
 
 
-def show_paintings_by_rooms(ruta, sales, quadres, visitant):
+def show_paintings_by_rooms(ruta, sales, quadres, visitant, knowledge_factor):
     total_time_per_day = visitant.hores * 60 + (visitant.hores * 60 * 0.1) 
     day = 1
     remaining_time = total_time_per_day
@@ -560,7 +735,7 @@ def show_paintings_by_rooms(ruta, sales, quadres, visitant):
             room_of_painting = painting.sala
 
             if room == room_of_painting:
-                time_for_painting = calculate_observation_time(painting)
+                time_for_painting = calculate_observation_time(painting, knowledge_factor)
 
                 if time_for_painting > remaining_time:
                     if paintings_in_room:
@@ -612,9 +787,10 @@ if __name__ == "__main__":
         autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
     # Asignar las salas según el estilo de cada cuadro
     #salas = assign_salas(quadres)
+    rutes = rutes_predeterminades(quadres)
     visitante = gather_visitor_info()
-    show_visitor_classification(visitante)
+    knowledge_factor = show_visitor_classification(visitante)
     ruta = recommend_route(visitante, rutes)
-    refine_route(ruta, visitante, quadres)
-    show_paintings_by_rooms(ruta, sales, quadres, visitante)
+    refine_route(ruta, visitante, quadres, knowledge_factor)
+    show_paintings_by_rooms(ruta, sales, quadres, visitante, knowledge_factor)
     puntuacio_ruta = puntuar_ruta()
