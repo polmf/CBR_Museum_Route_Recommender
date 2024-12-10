@@ -43,7 +43,7 @@ def calculate_observation_time_pred(painting):
     )
 
     total_time = (base_time * complexity_factor * relevance_factor)
-    return total_time
+    return round(total_time)
 
 import random
 
@@ -686,7 +686,7 @@ def calculate_observation_time(painting, knowledge_factor):
     
 
     total_time = (base_time * complexity_factor * relevance_factor * knowledge_factor)
-    return total_time
+    return round(total_time)
 
 
 def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_author, visitant, knowledge_factor):
@@ -781,6 +781,7 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
 
     day = 1
     time_spent_today = 0
+    total_time_spent = 0  # Variable para llevar el tiempo total empleado
     paintings_to_see = []
 
     # Ordenar las salas por número (para asegurar que las salas se visiten en orden)
@@ -810,7 +811,9 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
                     for quadre_painting, time_painting in rooms_visited[sala_visited]:
                         print(f"    - {quadre_painting.nom}, time: {round(time_painting, 2)} minutes")
                 
-                # Pasar al siguiente día
+                # Mostrar el tiempo empleado en el día actual
+                print(f"Time spent Day {day}: {round(time_spent_today, 2)} minutes")
+                total_time_spent += time_spent_today  # Añadir el tiempo del día al total
                 day += 1
                 time_spent_today = time_for_painting  # Inicia con la pintura que no cabía en el día anterior
                 paintings_to_see = [(sala, quadre, time_for_painting)]  # Empieza el nuevo día con esa pintura
@@ -829,6 +832,14 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
             print(f"  Paintings to see in room {sala_visited}:")
             for quadre_painting, time_painting in rooms_visited[sala_visited]:
                 print(f"    - {quadre_painting.nom}, time: {round(time_painting, 2)} minutes")
+        
+        # Tiempo del último día
+        print(f"Time spent Day {day}: {round(time_spent_today, 2)} minutes")
+        total_time_spent += time_spent_today  # Añadir el tiempo del último día al total
+
+    # Mostrar el tiempo total empleado
+    print(f"\nTotal time spent: {round(total_time_spent, 2)} minutes")
+
 
 
 
