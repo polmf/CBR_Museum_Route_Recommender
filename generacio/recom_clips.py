@@ -725,7 +725,7 @@ def fill_remaining_time(route, visitant, quadres, knowledge_factor):
             route.temps += time_for_painting
     
 
-def refine_route(route, visitante, all_paintings, knowledge_factor):
+def refine_route(route, rutes, visitante, all_paintings, knowledge_factor):
     """
     Refine the recommended route by adding or removing paintings based on visitor preferences and time constraints.
     """
@@ -877,7 +877,7 @@ if __name__ == "__main__":
     visitante = gather_visitor_info()
     knowledge_factor = show_visitor_classification(visitante)
     ruta = recommend_route(visitante, rutes)
-    refine_route(ruta, visitante, quadres, knowledge_factor)
+    refine_route(ruta, rutes, visitante, quadres, knowledge_factor)
     llista_ruta = show_paintings_by_rooms(ruta, visitante, knowledge_factor)
     puntuacio_ruta = puntuar_ruta()
     

@@ -88,9 +88,10 @@ def simulate_multiple_visits(id, num_visits):
         else:
             visitante.companyia = random.choice(["alone", "group"])
 
-        show_visitor_classification(visitante)
+        rutes = rutes_predeterminades(quadres)
+        knowledge_factor = show_visitor_classification(visitante)
         ruta = recommend_route(visitante, rutes)  # Asignamos una ruta
-        refine_route(ruta, visitante, quadres)  # Refinamos la ruta basada en el visitante
+        refine_route(ruta, rutes, visitante, quadres, knowledge_factor)  # Refinamos la ruta basada en el visitante
         #show_paintings_by_rooms(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
         puntuacio_ruta = int(random.gauss(3, 1.5))  # Puntuación aleatoria de la ruta (distribución normal)
         
