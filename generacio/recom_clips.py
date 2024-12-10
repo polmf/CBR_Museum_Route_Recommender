@@ -9,15 +9,6 @@ class Ruta:
         self.quadres = quadres
         self.temps = temps
 
-    def get_nom(self):
-        return self.nom
-    
-    def get_quadres(self):
-        return self.quadres
-    
-    def get_temps(self):
-        return self.temps
-
 def calculate_observation_time_pred(painting):
     complexity = painting.complexitat
     dim_cm2 = painting.dim_cm2
@@ -669,18 +660,18 @@ def calculate_observation_time(painting, knowledge_factor):
     base_time = 1.0 if dim_cm2 < 5007 else 2.0
 
     complexity_factor = (
-        1.1 if complexity <= 1 else
-        1.2 if complexity <= 2 else
-        1.3 if complexity <= 3 else
-        1.4 if complexity <= 4 else
+        1.1 if complexity <= 2 else
+        1.2 if complexity <= 4 else
+        1.3 if complexity <= 6 else
+        1.4 if complexity <= 8 else
         1.5
     )
 
     relevance_factor = (
-        1.1 if relevance <= 1 else
-        1.2 if relevance <= 2 else
-        1.3 if relevance <= 3 else
-        1.4 if relevance <= 4 else
+        1.1 if relevance <= 2 else
+        1.2 if relevance <= 4 else
+        1.3 if relevance <= 6 else
+        1.4 if relevance <= 8 else
         1.5
     )
     
@@ -783,6 +774,9 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
     time_spent_today = 0
     total_time_spent = 0  # Variable para llevar el tiempo total empleado
     paintings_to_see = []
+    
+    # Lista para guardar la información de cada día
+    days = []
 
     # Ordenar las salas por número (para asegurar que las salas se visiten en orden)
     for sala in sorted(sales.keys()):
@@ -797,21 +791,22 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
                 paintings_to_see.append((sala, quadre, time_for_painting))
                 time_spent_today += time_for_painting
             else:
-                # Si no cabe más pintura en este día, muestra las pinturas del día actual
-                print(f"Day {day}:")
-                # Agrupar las pinturas por sala
-                rooms_visited = {}
+                # Si no cabe más pintura en este día, guarda las pinturas del día actual
+                day_info = {"day": day, "rooms": {}}
                 for sala_painting, quadre_painting, time_painting in paintings_to_see:
-                    if sala_painting not in rooms_visited:
-                        rooms_visited[sala_painting] = []
-                    rooms_visited[sala_painting].append((quadre_painting, time_painting))
-                
-                for sala_visited in rooms_visited:
-                    print(f"  Paintings to see in room {sala_visited}:")
-                    for quadre_painting, time_painting in rooms_visited[sala_visited]:
-                        print(f"    - {quadre_painting.nom}, time: {round(time_painting, 2)} minutes")
-                
+                    if sala_painting not in day_info["rooms"]:
+                        day_info["rooms"][sala_painting] = []
+                    day_info["rooms"][sala_painting].append((quadre_painting.nom, time_painting))
+
+                days.append(day_info)  # Guardar la información del día
+
                 # Mostrar el tiempo empleado en el día actual
+                print(f"Day {day}:")
+                for sala_visited, paintings in day_info["rooms"].items():
+                    print(f"  Paintings to see in room {sala_visited}:")
+                    for painting_name, time_spent in paintings:
+                        print(f"    - {painting_name}, time: {round(time_spent, 2)} minutes")
+
                 print(f"Time spent Day {day}: {round(time_spent_today, 2)} minutes")
                 total_time_spent += time_spent_today  # Añadir el tiempo del día al total
                 day += 1
@@ -819,29 +814,39 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
                 paintings_to_see = [(sala, quadre, time_for_painting)]  # Empieza el nuevo día con esa pintura
                 break
 
-    # Mostrar las pinturas restantes para el último día
+    # Guardar las pinturas restantes para el último día
     if paintings_to_see:
-        print(f"Day {day}:")
-        rooms_visited = {}
+        day_info = {"day": day, "rooms": {}}
         for sala_painting, quadre_painting, time_painting in paintings_to_see:
-            if sala_painting not in rooms_visited:
-                rooms_visited[sala_painting] = []
-            rooms_visited[sala_painting].append((quadre_painting, time_painting))
+            if sala_painting not in day_info["rooms"]:
+                day_info["rooms"][sala_painting] = []
+            day_info["rooms"][sala_painting].append((quadre_painting.nom, time_painting))
 
-        for sala_visited in rooms_visited:
+        days.append(day_info)
+
+        # Mostrar las pinturas del último día
+        print(f"Day {day}:")
+        for sala_visited, paintings in day_info["rooms"].items():
             print(f"  Paintings to see in room {sala_visited}:")
-            for quadre_painting, time_painting in rooms_visited[sala_visited]:
-                print(f"    - {quadre_painting.nom}, time: {round(time_painting, 2)} minutes")
+            for painting_name, time_spent in paintings:
+                print(f"    - {painting_name}, time: {round(time_spent, 2)} minutes")
         
-        # Tiempo del último día
         print(f"Time spent Day {day}: {round(time_spent_today, 2)} minutes")
         total_time_spent += time_spent_today  # Añadir el tiempo del último día al total
 
     # Mostrar el tiempo total empleado
     print(f"\nTotal time spent: {round(total_time_spent, 2)} minutes")
 
+    # Imprimir la información guardada de todos los días
+    print("\nSaved Information of the Days:")
+    for day_info in days:
+        print(f"Day {day_info['day']}:")
+        for room, paintings in day_info["rooms"].items():
+            print(f"  Paintings to see in room {room}:")
+            for painting_name, time_spent in paintings:
+                print(f"    - {painting_name}, time: {round(time_spent, 2)} minutes")
 
-
+    return days
 
 
 
@@ -873,47 +878,6 @@ if __name__ == "__main__":
     knowledge_factor = show_visitor_classification(visitante)
     ruta = recommend_route(visitante, rutes)
     refine_route(ruta, visitante, quadres, knowledge_factor)
-    show_paintings_by_rooms(ruta, visitante, knowledge_factor)
+    llista_ruta = show_paintings_by_rooms(ruta, visitante, knowledge_factor)
     puntuacio_ruta = puntuar_ruta()
-
-"""def show_paintings_by_rooms(ruta, sales, quadres, visitant, knowledge_factor):
-    total_time_per_day = visitant.hores * 60 + (visitant.hores * 60 * 0.1) 
-    day = 1
-    remaining_time = total_time_per_day
-
-    print(f"Details for {ruta}:")
-    for room in sales:
-        paintings_in_room = []
-
-        for painting in quadres:
-            room_of_painting = painting.sala
-
-            if room == room_of_painting:
-                time_for_painting = calculate_observation_time(painting, knowledge_factor)
-
-                if time_for_painting > remaining_time:
-                    if paintings_in_room:
-                        print(f"Day {day}: The paintings to see in room {room} are:")
-                        for p, t in paintings_in_room:
-                            print(f"  - {p.autor}, time: {t:.2f} minutes")
-
-                    print(f"Total time used on day {day}: {total_time_per_day - remaining_time:.2f} minutes\n")
-                    paintings_in_room = [(painting, time_for_painting)]
-                    day += 1
-
-                    if day > visitant.dies:
-                        #print("The route cannot fit into the available days.")
-                        return
-
-                    remaining_time = total_time_per_day - time_for_painting
-                else:
-                    paintings_in_room.append((painting, time_for_painting))
-                    remaining_time -= time_for_painting
-
-        if paintings_in_room:
-            print(f"Day {day}: The paintings to see in room {room} are:")
-            for p, t in paintings_in_room:
-                print(f"  - {p.nom}, time: {t:.2f} minutes")
-
-    print(f"Total time used on day {day}: {total_time_per_day - remaining_time:.2f} minutes\n")
-    print(f"Total route time: {ruta.temps:.2f} minutes\n")"""
+    

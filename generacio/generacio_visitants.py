@@ -1,8 +1,7 @@
 import pandas as pd
 from recom_clips import *
 import random
-from classes import Visitant
-from generacio_instancies import assign_salas, parse_cuadros
+from classes import *
 
 def simulate_responses():
     first_visit = random.choice([True, False])
@@ -13,9 +12,9 @@ def simulate_responses():
     edat = int(round(random.gauss(30, 15)))
 
     if edat < 16:
-        companyia = random.choice(["couple", "family", "group"])
+        companyia = "group"
     else:
-        companyia = random.choice(["alone", "couple", "family", "group"])
+        companyia = random.choice(["alone", "group"])
 
     dies = random.randint(1, 10)
     hores = random.randint(1, 12)
@@ -60,9 +59,19 @@ def simulate_responses():
         interessos_estils=interessos_estils
     )
 
-file_path = "data/cuadros.txt"  # Cambia la ruta al archivo real
-quadres, autores = parse_cuadros(file_path)
-salas = assign_salas(quadres)
+with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
+        quadres_data = json.load(f_quadres)
+        quadres = [Quadre.from_dict(data) for data in quadres_data]
+
+    # Leer y convertir el archivo de las sales
+with open('data/sales.json', 'r', encoding='utf-8') as f_sales:
+    sales_data = json.load(f_sales)
+    sales = {sala_id: Sala.from_dict(data) for sala_id, data in sales_data.items()}
+
+    # Leer y convertir el archivo de los autores
+with open('data/autors.json', 'r', encoding='utf-8') as f_autores:
+    autores_data = json.load(f_autores)
+    autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
 
 def simulate_multiple_visits(id, num_visits):
     """
@@ -75,14 +84,14 @@ def simulate_multiple_visits(id, num_visits):
         visitante.dies = random.randint(1, 10)  # Cambiamos el número de días de visita
         visitante.hores = random.randint(1, 8)
         if visitante.edat < 16:
-            visitante.companyia = random.choice(["couple", "family", "group"])
+            visitante.companyia = "group"
         else:
-            visitante.companyia = random.choice(["alone", "couple", "family", "group"])
+            visitante.companyia = random.choice(["alone", "group"])
 
         show_visitor_classification(visitante)
         ruta = recommend_route(visitante, rutes)  # Asignamos una ruta
         refine_route(ruta, visitante, quadres)  # Refinamos la ruta basada en el visitante
-        show_paintings_by_rooms(ruta, salas, quadres, visitante)  # Mostramos las pinturas por salas
+        #show_paintings_by_rooms(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
         puntuacio_ruta = int(random.gauss(3, 1.5))  # Puntuación aleatoria de la ruta (distribución normal)
         
         # Almacenamos la visita con la ruta y su puntuación
