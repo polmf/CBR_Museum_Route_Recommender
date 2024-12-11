@@ -511,128 +511,249 @@ def calculate_route_scores(visitant, category_museum, category_age, category_kno
 
     # Ruta 1: Experiència baixa, ideal per a nens i novells
     scores['ruta1'] = 0
-    if visitant.visites == 0:  # Primera visita
-        scores['ruta1'] += 2
+    if visitant.companyia == "group":
+        scores['ruta1'] += 1
     if category_museum == "Novice":
-        scores['ruta1'] += 2
+        scores['ruta1'] += 1
     if category_age == "Child":
-        scores['ruta1'] += 3
-    if category_knowledge == "Novice":
         scores['ruta1'] += 2
+    if category_knowledge == "Novice":
+        scores['ruta1'] += 1
+    if visitant.estudis == "no":
+        scores['ruta1'] += 2
+    if visitant.dies <= 2:  
+        scores['ruta1'] += 2
+    if visitant.hores <= 2:  
+        scores['ruta1'] += 1
 
     # Ruta 2: Experiència mitjana-baixa
     scores['ruta2'] = 0
-    if category_museum in ["Beginner", "Intermediate"]:
+    if visitant.companyia == "group":
         scores['ruta2'] += 2
-    if category_knowledge in ["Beginner", "Intermediate"]:
+    if category_museum  in ["Novice", "Beginner"]:
+        scores['ruta2'] += 1
+    if category_age in ["Teenager", "Adult"]:
+        scores['ruta2'] += 1
+    if category_knowledge in ["Novice", "Beginner"]:
+        scores['ruta2'] += 1
+    if visitant.estudis == "no":
         scores['ruta2'] += 2
-    if visitant.dies > 1:  # Dies mitjans
+    if visitant.dies <= 2:  
         scores['ruta2'] += 2
+    if visitant.hores <= 2:  
+        scores['ruta2'] += 1
+
 
     # Ruta 3: Experiència mitjana-alta, pensada per a joves amb cert coneixement
     scores['ruta3'] = 0
-    if category_age == "Teenager":
-        scores['ruta3'] += 3
-    if visitant.coneixements == "yes":
+    if visitant.companyia in ["alone", "group"]:
+        scores['ruta3'] += 1
+    if category_museum  in ["Intermediate", "Advanced"]:
+        scores['ruta3'] += 1
+    if category_age in ["Adult", "Senior"]:
         scores['ruta3'] += 2
-    if visitant.visites >= 2:
+    if category_knowledge in ["Intermediate", "Advanced"]:
         scores['ruta3'] += 2
+    if visitant.estudis == "yes":
+        scores['ruta3'] += 1
+    if visitant.dies <= 2:  
+        scores['ruta3'] += 2
+    if visitant.hores <= 2:  
+        scores['ruta3'] += 1
 
     # Ruta 4: Experiència alta, ideal per a adults sols i coneixedors
     scores['ruta4'] = 0
     if visitant.companyia == "alone":
+        scores['ruta4'] += 1
+    if category_museum  in ["Advanced", "Expert"]:
+        scores['ruta4'] += 1
+    if category_age in ["Adult", "Senior"]:
+        scores['ruta4'] += 1
+    if category_knowledge in ["Expert", "Advanced"]:
         scores['ruta4'] += 2
-    if category_knowledge in ["Intermediate", "Advanced", "Expert"]:
-        scores['ruta4'] += 3
-    if any(style in ["modernisme", "barroc", "renaixement", "realisme"] for style in visitant.interessos_estils):
+    if visitant.estudis == "yes":
         scores['ruta4'] += 2
+    if visitant.dies <= 2:  
+        scores['ruta4'] += 2
+    if visitant.hores <= 2:  
+        scores['ruta4'] += 1
 
     # Ruta 5: Experiència baixa amb dies mitjans i nens
     scores['ruta5'] = 0
+    if visitant.companyia == "group":
+        scores['ruta5'] += 2
+    if category_museum in ["Novice", "Beginner"]:
+        scores['ruta5'] += 1
     if category_age == "Child":
-        scores['ruta5'] += 3
-    if visitant.dies > 1:
         scores['ruta5'] += 2
-    if category_museum == "Novice":
+    if category_knowledge in ["Novice", "Beginner"]:
+        scores['ruta5'] += 1
+    if visitant.estudis == "no":
+        scores['ruta5'] += 1
+    if visitant.dies <= 5 and visitant.dies >2:  
         scores['ruta5'] += 2
+    if visitant.hores <= 5:  
+        scores['ruta5'] += 1
 
     # Ruta 6: Experiència baixa sense nens amb dies mitjans
     scores['ruta6'] = 0
-    if category_age in ["Adult", "Teenager"]:
+    if visitant.companyia in ["alone", "group"]:
         scores['ruta6'] += 2
-    if visitant.dies == 2:
+    if category_museum  in ["Novice", "Beginner"]:
+        scores['ruta6'] += 1
+    if category_age in ["Teenager", "Adult"]:
         scores['ruta6'] += 2
-    if visitant.coneixements == "no":
+    if category_knowledge in ["Novice", "Beginner"]:
+        scores['ruta6'] += 1
+    if visitant.estudis == "no":
+        scores['ruta6'] += 1
+    if visitant.dies <= 5 and visitant.dies >2:  
         scores['ruta6'] += 2
+    if visitant.hores <= 5:  
+        scores['ruta6'] += 1
 
     # Ruta 7: Experiència mitjana-baixa amb dies mitjans
     scores['ruta7'] = 0
-    if visitant.companyia == "group":
+    if visitant.companyia in ["alone", "group"]:
+        scores['ruta7'] += 1
+    if category_museum  in ["Intermediate", "Beginner"]:
+        scores['ruta7'] += 1
+    if category_age in ["Teenager", "Adult"]:
         scores['ruta7'] += 2
-    if category_age == "Teenager":
+    if category_knowledge in ["Beginner", "Intermediate"]:
+        scores['ruta7'] += 1
+    if visitant.estudis == "no":
         scores['ruta7'] += 2
-    if visitant.dies == 2:
+    if visitant.dies <= 5 and visitant.dies >2:  
         scores['ruta7'] += 2
+    if visitant.hores <= 5:  
+        scores['ruta7'] += 1
 
     # Ruta 8: Experiència mitjana amb dies mitjans
     scores['ruta8'] = 0
-    if category_age == "Senior":
+    if visitant.companyia in ["alone", "group"]:
+        scores['ruta8'] += 1
+    if category_museum  in ["Intermediate", "Advanced"]:
+        scores['ruta8'] += 1
+    if category_age in ["Teenager", "Adult", "Senior"]:
+        scores['ruta8'] += 1
+    if category_knowledge in ["Advanced", "Intermediate"]:
         scores['ruta8'] += 2
-    if category_knowledge in ["Intermediate", "Advanced"]:
+    if visitant.estudis == "yes":
         scores['ruta8'] += 2
-    if visitant.visites >= 3:
+    if visitant.dies <= 5 and visitant.dies >2:  
         scores['ruta8'] += 2
+    if visitant.hores <= 5:  
+        scores['ruta8'] += 1
 
     # Ruta 9: Experiència alta amb dies mitjans
     scores['ruta9'] = 0
-    if visitant.companyia == "group":
-        scores['ruta9'] += 3
-    if visitant.dies >= 2:
-        scores['ruta9'] += 2
+    if visitant.companyia == "alone":
+        scores['ruta9'] += 1
+    if category_museum  in ["Expert", "Advanced"]:
+        scores['ruta9'] += 1
+    if category_age in ["Adult", "Senior"]:
+        scores['ruta9'] += 1
     if category_knowledge in ["Advanced", "Expert"]:
-        scores['ruta9'] += 3
+        scores['ruta9'] += 2
+    if visitant.estudis == "yes":
+        scores['ruta9'] += 2
+    if visitant.dies <= 5 and visitant.dies >2:  
+        scores['ruta9'] += 2
+    if visitant.hores <= 5:  
+        scores['ruta9'] += 1
 
     # Ruta 10: Experiència baixa amb dies alts i nens
     scores['ruta10'] = 0
+    if visitant.companyia == "group":
+        scores['ruta10'] += 2
+    if category_museum in ["Novice", "Beginner"]:
+        scores['ruta10'] += 1
     if category_age == "Child":
-        scores['ruta10'] += 3
-    if visitant.dies > 3:
         scores['ruta10'] += 2
-    if visitant.visites == 0:
+    if category_knowledge in ["Novice", "Beginner"]:
+        scores['ruta10'] += 1
+    if visitant.estudis == "no":
+        scores['ruta10'] += 1
+    if visitant.dies > 6:  
         scores['ruta10'] += 2
+    if visitant.hores > 3:  
+        scores['ruta10'] += 1
 
     # Ruta 11: Experiència baixa amb dies alts sense nens
     scores['ruta11'] = 0
-    if category_age == "Adult":
+    if visitant.companyia in ["alone", "group"]:
+        scores['ruta11'] += 1
+    if category_museum  in ["Novice", "Beginner"]:
+        scores['ruta11'] += 1
+    if category_age in ["Teenager", "Adult"]:
         scores['ruta11'] += 2
-    if visitant.dies > 3:
+    if category_knowledge in ["Novice", "Beginner"]:
+        scores['ruta11'] += 1
+    if visitant.estudis == "no":
         scores['ruta11'] += 2
+    if visitant.dies > 6:  
+        scores['ruta11'] += 2
+    if visitant.hores > 3:  
+        scores['ruta11'] += 1
 
     # Ruta 12: Experiència mitjana-baixa amb dies alts
     scores['ruta12'] = 0
-    if visitant.dies > 3:
-        scores['ruta12'] += 3
-    if visitant.coneixements == "yes":
+    if visitant.companyia in ["alone", "group"]:
+        scores['ruta12'] += 1
+    if category_museum  in ["Intermediate", "Beginner"]:
+        scores['ruta12'] += 1
+    if category_age in ["Teenager", "Adult"]:
         scores['ruta12'] += 2
+    if category_knowledge in ["Beginner", "Intermediate"]:
+        scores['ruta12'] += 1
+    if visitant.estudis == "no":
+        scores['ruta12'] += 2
+    if visitant.dies > 6:  
+        scores['ruta12'] += 2
+    if visitant.hores > 3:  
+        scores['ruta12'] += 1
 
     # Ruta 13: Experiència mitjana amb dies alts
     scores['ruta13'] = 0
-    if category_knowledge in ["Intermediate", "Advanced"]:
-        scores['ruta13'] += 3
-    if visitant.dies > 3:
+    if visitant.companyia in ["alone", "group"]:
+        scores['ruta13'] += 1
+    if category_museum  in ["Intermediate", "Advanced"]:
+        scores['ruta13'] += 1
+    if category_age in ["Teenager", "Adult", "Senior"]:
+        scores['ruta13'] += 1
+    if category_knowledge in ["Advanced", "Intermediate"]:
         scores['ruta13'] += 2
+    if visitant.estudis == "yes":
+        scores['ruta13'] += 2
+    if visitant.dies > 6:  
+        scores['ruta13'] += 2
+    if visitant.hores > 3:  
+        scores['ruta13'] += 1
+
 
     # Ruta 14: Experiència alta amb moltes dies
     scores['ruta14'] = 0
-    if category_knowledge in ["Advanced", "Expert"]:
-        scores['ruta14'] += 3
-    if visitant.dies > 4:
-        scores['ruta14'] += 3
     if visitant.companyia == "alone":
+        scores['ruta14'] += 1
+    if category_museum  in ["Expert", "Advanced"]:
+        scores['ruta14'] += 1
+    if category_age in ["Adult", "Senior"]:
+        scores['ruta14'] += 1
+    if category_knowledge in ["Advanced", "Expert"]:
         scores['ruta14'] += 2
+    if visitant.estudis == "yes":
+        scores['ruta14'] += 2
+    if visitant.dies > 6:  
+        scores['ruta14'] += 2
+    if visitant.hores > 3:  
+        scores['ruta14'] += 1
 
+    max_score = max(scores.values())
+    options_with_max_score = [option for option, score in scores.items() if score == max_score]
+    final_route_name = random.choice(options_with_max_score)
     # Selecció final de la millor ruta
-    final_route_name = max(scores, key=scores.get)
+    #final_route_name = max(scores, key=scores.get)
     print(f"La ruta recomanada segons les teves preferències és: {final_route_name}")
 
     for ruta in rutes:
