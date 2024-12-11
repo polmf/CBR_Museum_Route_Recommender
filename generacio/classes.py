@@ -29,12 +29,13 @@ class Autor:
 
 
 class Quadre:
-    def __init__(self, nom=None, dim_cm2=None, any=None, autor=None, estil=None, complexitat=None, rellevancia=None, constituent_id=None, sala=None):
+    def __init__(self, nom=None, dim_cm2=None, any=None, autor=None, estil=None, tipus=None, complexitat=None, rellevancia=None, constituent_id=None, sala=None):
         self.nom = nom
         self.dim_cm2 = dim_cm2
         self.any = any
         self.autor = autor
         self.estil = estil
+        self.tipus = tipus
         self.complexitat = complexitat
         self.rellevancia = rellevancia
         self.constituent_id = constituent_id
@@ -47,6 +48,7 @@ class Quadre:
             'any': self.any,
             'autor': self.autor,
             'estil': self.estil,
+            'tipus': self.tipus,
             'complexitat': self.complexitat,
             'relevancia': self.rellevancia,
             'constituent_id': self.constituent_id,
@@ -61,6 +63,7 @@ class Quadre:
             any=data.get('any'),
             autor=data.get('autor'),
             estil=data.get('estil'),
+            tipus=data.get('tipus'),
             complexitat=data.get('complexitat'),
             rellevancia=data.get('relevancia'),
             constituent_id=data.get('constituent_id'),
@@ -98,7 +101,7 @@ class Sala:
 
 
 class Visitant:
-    def __init__(self, visites=None, companyia=None, dies=None, hores=None, edat=None, estudis=None, coneixement=None, quizz=None, interessos_autor=None, interessos_estils=None):
+    def __init__(self, visites=None, companyia=None, dies=None, hores=None, edat=None, estudis=None, coneixement=None, quizz=None, interessos_autor=None, interessos_estils=None, interessos_type= None):
         self.visites = visites
         self.companyia = companyia
         self.dies = dies
@@ -109,6 +112,7 @@ class Visitant:
         self.quizz = quizz
         self.interessos_autor = interessos_autor if interessos_autor else []
         self.interessos_estils = interessos_estils if interessos_estils else []
+        self.interessos_type = interessos_type if interessos_type else []
         self.feedback = None
 
     def get_visites(self):
