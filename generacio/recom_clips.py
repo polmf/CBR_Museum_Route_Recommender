@@ -980,6 +980,65 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
 
     return days
 
+def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor):
+    total_time_per_day = visitant.hores * 60 + (visitant.hores * 60 * 0.1)  # Tiempo total disponible por día en minutos
+    sales = {}
+
+    # Organizar las pinturas por salas
+    for quadre in ruta.instancies:
+        sala = quadre.sala
+        if sala not in sales:
+            sales[sala] = []
+        sales[sala].append(quadre)
+
+    day = 1
+    time_spent_today = 0
+    total_time_spent = 0  # Variable para llevar el tiempo total empleado
+    paintings_to_see = []
+    
+    # Lista para guardar la información de cada día
+    days = []
+
+    # Ordenar las salas por número (para asegurar que las salas se visiten en orden)
+    for sala in sorted(sales.keys()):
+        llista_cuadres = sales[sala]
+
+        # Recorrer las pinturas de la sala
+        for quadre in llista_cuadres:
+            time_for_painting = calculate_observation_time(quadre, knowledge_factor)
+
+            # Si el tiempo actual más el tiempo de la pintura no excede el tiempo disponible del día
+            if time_spent_today + time_for_painting <= total_time_per_day:
+                paintings_to_see.append((sala, quadre, time_for_painting))
+                time_spent_today += time_for_painting
+            else:
+                # Si no cabe más pintura en este día, guarda las pinturas del día actual
+                day_info = {"day": day, "rooms": {}}
+                for sala_painting, quadre_painting, time_painting in paintings_to_see:
+                    if sala_painting not in day_info["rooms"]:
+                        day_info["rooms"][sala_painting] = []
+                    day_info["rooms"][sala_painting].append((quadre_painting.nom, time_painting))
+
+                days.append(day_info)  # Guardar la información del día
+
+                total_time_spent += time_spent_today  # Añadir el tiempo del día al total
+                day += 1
+                time_spent_today = time_for_painting  # Inicia con la pintura que no cabía en el día anterior
+                paintings_to_see = [(sala, quadre, time_for_painting)]  # Empieza el nuevo día con esa pintura
+                break
+
+    # Guardar las pinturas restantes para el último día
+    if paintings_to_see:
+        day_info = {"day": day, "rooms": {}}
+        for sala_painting, quadre_painting, time_painting in paintings_to_see:
+            if sala_painting not in day_info["rooms"]:
+                day_info["rooms"][sala_painting] = []
+            day_info["rooms"][sala_painting].append((quadre_painting.nom, time_painting))
+
+        days.append(day_info)
+        total_time_spent += time_spent_today  # Añadir el tiempo del último día al total
+
+    return days
 
 
 def puntuar_ruta():
@@ -1013,4 +1072,5 @@ if __name__ == "__main__":
     refine_route(ruta, rutes, visitante, quadres, knowledge_factor)
     llista_ruta = show_paintings_by_rooms(ruta, visitante, knowledge_factor)
     puntuacio_ruta = puntuar_ruta()
+    print(llista_ruta)
     
