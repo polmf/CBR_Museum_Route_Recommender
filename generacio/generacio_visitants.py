@@ -102,7 +102,7 @@ def simulate_multiple_visits(id, num_visits):
         knowledge_factor = show_visitor_classification(visitante)
         ruta = recommend_route(visitante, rutes)  # Asignamos una ruta
         refine_route(ruta, rutes, visitante, quadres, knowledge_factor)  # Refinamos la ruta basada en el visitante
-        #show_paintings_by_rooms(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
+        show_paintings_by_rooms(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
         puntuacio_ruta = int(random.gauss(3, 1.5))  # Puntuación aleatoria de la ruta (distribución normal)
         
         # Almacenamos la visita con la ruta y su puntuación
@@ -141,7 +141,7 @@ for visitant_id, _ in enumerate(range(num_visitants)):
 df = pd.DataFrame(base_de_casos)
 
 # Guardamos el DataFrame en un archivo CSV
-df.to_csv('data/base_de_dades.csv', index=False)
+df.to_csv('data/base_de_dades_final.csv', index=False)
 
 print("Base de datos guardada en 'base_de_dades.csv'")
 
