@@ -1,6 +1,7 @@
 from classes import *
 import random
 import json
+import pandas as pd
 class Ruta:
     def __init__(self, nom, instancies, sales_ocupades = {}, quadres = [], temps=0.0):
         self.nom = nom
@@ -235,7 +236,12 @@ def rutes_predeterminades(quadres):
 
     return rutes
 
+def load_database():
+    df = pd.read_csv("artworks_data/artworks_final.csv")
+    return df
 
+def get_unique_options(df, column_name):
+    return df[column_name].dropna().unique().tolist()
 
 def yes_or_no(question):
     answer = input(question).strip().lower()
@@ -339,29 +345,23 @@ def start_quiz():
     return score
 
 # Interests
-def interests_of_autor():
+def interests_of_autor(df):
     question = "Which of the following artists interest you the most? Please, choose at most three."
-    options = [
-        "ignacio-pinazo-camarlench", "fillol-granell-antonio", "federico-de-madrazo",
-        "diego-rodriguez-de-silva-y-velazquez", "tiziano-vecellio", "joaquin-sorolla",
-        "fiodor-rokotov", "peter-paul-rubens", "rembrandt-van-rijn", "pieter-bruegel-el-vell",
-        "j-m-w-turner", "leonardo-da-vinci", "rosa-bonheur", "winslow-homer",
-        "edouard-vuillard", "charles-burchfield", "ben-shahn", "sandro-botticelli",
-        "salvador-dali", "edvard-munch", "edouard-manet", "hieronymus-bosch",
-        "johannes-vermeer", "eugene-delacroix", "not-sure"
-    ]
+    options = get_unique_options(df, "Artist")
     return ask_multiple_options(question, options, 3)
 
-def interests_of_style():
+def interests_of_style(df):
     question = "Which of the following styles interest you the most? Please, choose at most three."
-    options = [
-        "modernisme", "romanticisme", "barroc", "renaixement", "impressionisme",
-        "realisme", "contemporani", "surrealisme", "expressionisme", "not-sure"
-    ]
+    options = get_unique_options(df, "Style")
+    return ask_multiple_options(question, options, 3)
+
+def interests_type(df):
+    question = "Which of the following type art interest you the most? Please, choose at most three."
+    options = get_unique_options(df, "Classification")
     return ask_multiple_options(question, options, 3)
 
 # Función para reunir la información del visitante
-def gather_visitor_info():
+def gather_visitor_info(df):
     print("Hello! My name is Muse, and I'm here to make your experience in the museum better.")
     print("In order to personalize your experience, I need you to answer a few questions.")
     print("It will only take a couple of minutes. Ready? Let's go!")
@@ -375,8 +375,9 @@ def gather_visitor_info():
     estudis = studies()# Edad del visitante (o la más joven en el grupo)
     coneixement = art_knowledge()  # Conocimiento sobre arte
     quizz = start_quiz()  # Puntuación del quiz
-    interessos_autor = interests_of_autor()  # Intereses en autores
-    interessos_estils = interests_of_style()  # Intereses en estilos
+    interessos_autor = interests_of_autor(df)  # Intereses en autores
+    interessos_estils = interests_of_style(df)  # Intereses en estilos
+    interessos_type = interests_type(df)
 
     # Crear un objeto Visitant con los valores recolectados
     visitant = Visitant(
@@ -389,7 +390,8 @@ def gather_visitor_info():
         coneixement=coneixement,
         quizz=quizz,
         interessos_autor=interessos_autor,
-        interessos_estils=interessos_estils
+        interessos_estils=interessos_estils,
+        interessos_type=interessos_type
     )
 
     return visitant
@@ -680,7 +682,7 @@ def calculate_observation_time(painting, knowledge_factor):
     return round(total_time)
 
 
-def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_author, visitant, knowledge_factor):
+def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_author, new_paintings_by_type, visitant, knowledge_factor):
     max_time = visitant.hores * 60 * visitant.dies
 
     for painting in new_paintings_by_style:
@@ -695,6 +697,14 @@ def add_paintings_to_route(route, new_paintings_by_style, new_paintings_by_autho
         time_for_painting = calculate_observation_time(painting, knowledge_factor)
         #if route.sales_ocupades.get(painting.sala, 0) <=10  and route.temps + time_for_painting < max_time and  painting.nom not in route.quadres:
         if route.temps + time_for_painting < max_time and  painting.nom not in route.quadres:
+            route.quadres.append(painting.nom)
+            route.instancies.append(painting)
+            route.temps += time_for_painting
+            
+    for painting in new_paintings_by_type:
+        time_for_painting = calculate_observation_time(painting, knowledge_factor)
+        #if route.sales_ocupades.get(painting.sala, 0) <=10  and route.temps + time_for_painting < max_time and  painting.nom not in route.quadres:
+        if route.temps + time_for_painting < max_time and painting.nom not in route.quadres:
             route.quadres.append(painting.nom)
             route.instancies.append(painting)
             route.temps += time_for_painting
@@ -731,21 +741,22 @@ def refine_route(route, rutes, visitante, all_paintings, knowledge_factor):
     """
     route.temps = route.temps * knowledge_factor
     # Find paintings by style and author interests
-    paintings_by_style = [quadre.nom for quadre in all_paintings if quadre.estil==visitante.interessos_estils ]
-    paintings_by_author = [quadre.nom for quadre in all_paintings if quadre.autor==visitante.interessos_autor ]
+    paintings_by_style = [quadre for quadre in all_paintings if quadre.estil==visitante.interessos_estils ]
+    paintings_by_author = [quadre for quadre in all_paintings if quadre.autor==visitante.interessos_autor ]
+    paintings_by_type = [quadre for quadre in all_paintings if quadre.tipus==visitante.interessos_type ]
 
     # Add paintings to the route
     for ruta in rutes:
         if ruta.nom == route:
             add_paintings_to_route(
-                ruta, paintings_by_style, paintings_by_author,
+                ruta, paintings_by_style, paintings_by_author, paintings_by_type,
                 visitante, knowledge_factor
             )
 
     # Remove paintings if the route exceeds time constraints
         if ruta.temps >= visitante.dies * visitante.hores *60:
             remove_paintings_from_route(
-                ruta, paintings_by_style+ paintings_by_author,
+                ruta, paintings_by_style + paintings_by_author + paintings_by_type,
                 visitante, all_paintings, knowledge_factor
             )
 
@@ -873,8 +884,9 @@ if __name__ == "__main__":
         autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
     # Asignar las salas según el estilo de cada cuadro
     #salas = assign_salas(quadres)
+    df = load_database()
     rutes = rutes_predeterminades(quadres)
-    visitante = gather_visitor_info()
+    visitante = gather_visitor_info(df)
     knowledge_factor = show_visitor_classification(visitante)
     ruta = recommend_route(visitante, rutes)
     refine_route(ruta, rutes, visitante, quadres, knowledge_factor)

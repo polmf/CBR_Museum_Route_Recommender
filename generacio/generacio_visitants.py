@@ -3,7 +3,21 @@ from recom_clips import *
 import random
 from classes import *
 
-def simulate_responses():
+# Cargar la base de datos
+def load_database():
+    df = pd.read_csv("artworks_data/artworks_final.csv")
+    return df
+
+# Función auxiliar para obtener valores únicos de una columna
+def get_unique_options(df, column_name):
+    return df[column_name].dropna().unique().tolist()
+
+# Generar intereses aleatorios
+def generate_random_interests(options, max_choices=3):
+    return random.sample(options, random.randint(1, max_choices))
+
+
+def simulate_responses(options_autor, options_estils, options_type):
     first_visit = random.choice([True, False])
     visitas = 0 if first_visit else random.randint(1, 10)
 
@@ -28,23 +42,11 @@ def simulate_responses():
         quizz = random.randint(0, 6)  # Rango completo si no cumple los criterios
 
     quizz = int(round(quizz))  # Aseguramos que sea un entero
-    interessos_autor = random.sample(
-        [
-            "ignacio-pinazo-camarlench", "fillol-granell-antonio", "federico-de-madrazo",
-            "diego-rodriguez-de-silva-y-velazquez", "tiziano-vecellio", "joaquin-sorolla",
-            "fiodor-rokotov", "peter-paul-rubens", "rembrandt-van-rijn", "pieter-bruegel-el-vell",
-            "j-m-w-turner", "leonardo-da-vinci", "rosa-bonheur", "winslow-homer",
-            "edouard-vuillard", "charles-burchfield", "ben-shahn", "sandro-botticelli",
-            "salvador-dali", "edvard-munch", "edouard-manet", "hieronymus-bosch",
-            "johannes-vermeer", "eugene-delacroix", "not-sure"
-        ],
-        random.randint(1, 3)  # Máximo 3 intereses
-    )
-    interessos_estils = random.sample(
-        ["modernisme", "romanticisme", "barroc", "renaixement", "impressionisme",
-         "realisme", "contemporani", "surrealisme", "expressionisme", "not-sure"],
-        random.randint(1, 3)  # Máximo 3 intereses
-    )
+    
+    # Generar intereses aleatorios
+    interessos_autor = generate_random_interests(options_autor, 3)
+    interessos_estils = generate_random_interests(options_estils, 3)
+    interessos_type = generate_random_interests(options_type, 3)
 
     return Visitant(
         visites=visitas,
@@ -56,7 +58,8 @@ def simulate_responses():
         coneixement=coneixement,
         quizz=quizz,
         interessos_autor=interessos_autor,
-        interessos_estils=interessos_estils
+        interessos_estils=interessos_estils,
+        interessos_type=interessos_type
     )
 
 with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
@@ -72,12 +75,19 @@ with open('data/sales.json', 'r', encoding='utf-8') as f_sales:
 with open('data/autors.json', 'r', encoding='utf-8') as f_autores:
     autores_data = json.load(f_autores)
     autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
+    
+df = load_database()
+    
+# Obtener opciones dinámicamente
+options_autor = get_unique_options(df, "Artist")
+options_estils = get_unique_options(df, "Style")
+options_type = get_unique_options(df, "Classification")
 
 def simulate_multiple_visits(id, num_visits):
     """
     Función para simular múltiples visitas de un usuario, generando una ruta y puntuación para cada una.
     """
-    visitante = simulate_responses()  # Generamos un visitante único
+    visitante = simulate_responses(options_autor, options_estils, options_type)  # Generamos un visitante único
     visitas = []
     
     for num_visita in range(num_visits):  # Generamos varios registros de visitas para el mismo visitante
@@ -108,6 +118,7 @@ def simulate_multiple_visits(id, num_visits):
             'visitant_quizz': visitante.quizz,
             'visitant_interessos_autor': visitante.interessos_autor,
             'visitant_interessos_estils': visitante.interessos_estils,
+            'visitant_interessos_tipus': visitante.interessos_type,
             'ruta': ruta.nom,
             'ruta_quadres': ruta.quadres,
             'ruta_temps' : round(ruta.temps),
