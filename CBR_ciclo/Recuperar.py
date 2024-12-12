@@ -72,12 +72,12 @@ class Recuperar:
         return most_similar_cluster        
         
 
-    def get_10_most_similar_cases(
+    def get_3_most_similar_cases(
         self,
         most_similar_cluster: int
         ) -> pd.DataFrame:
         """
-        Obtiene los 10 casos más similares al nuevo usuario.
+        Obtiene los 3 casos más similares al nuevo usuario.
         """
         similar_cases = self._base_de_casos_normalized[self._base_de_casos_normalized['cluster'] == most_similar_cluster]
         
@@ -96,9 +96,9 @@ class Recuperar:
             dist_coseno, 
             dist_hamming
         )
-        casos_similares_10 = sorted(dist_total, key=lambda x: x[1])[:10]
+        casos_similares_3 = sorted(dist_total, key=lambda x: x[1])[:3]
 
-        return casos_similares_10
+        return casos_similares_3
 
     def calculate_cosine_similarity(
         self, 
@@ -142,10 +142,10 @@ class Recuperar:
 
         return distancia_total
 
-    def recommend_10_similar_users(self):
+    def recommend_3_similar_users(self):
         most_similar_cluster = self.get_most_similar_cluster()
-        top_10_similar_cases = self.get_10_most_similar_cases(most_similar_cluster)
+        top_3_similar_cases = self.get_3_most_similar_cases(most_similar_cluster)
 
-        return top_10_similar_cases
+        return top_3_similar_cases
 
     
