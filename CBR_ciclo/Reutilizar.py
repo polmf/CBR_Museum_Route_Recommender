@@ -3,6 +3,11 @@ import pandas as pd
 from generacio.classes import Visitant
 from transformations.functions import normalization
 from scipy.spatial.distance import cosine, hamming
+from generacio.classes import Visitant
+from generacio.classes import Quadre
+from generacio.classes import Sala
+from generacio.classes import Autor
+import json
 
 class Reutilizar:
     """
@@ -19,7 +24,12 @@ class Reutilizar:
     def __init__(self, user_to_recommend: Visitant, top_3_similar_cases: pd.DataFrame):
         self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
         # TODO
-        self._cuadros = pd.read_csv("data/cuadros.txt")
+        with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
+            quadres_data = json.load(f_quadres)
+            quadres = [Quadre.from_dict(data) for data in quadres_data]
+        
+        self.quadres = quadres
+
 
         self.top_3_similar_cases = top_3_similar_cases
         self.user_to_recommend = user_to_recommend
@@ -55,34 +65,36 @@ class Reutilizar:
         route: Dict[str, Union[str, int]]
         ):
 
-        print("Ruta:", route)
-        print()
-        print("----"*30)
-        print()
-        """
-        Ajusta la ruta recomendada a las preferencias del nuevo usuario.
-        """
-        # Ajustar los artistas y estilos de la ruta 
-    
-        # Si en la base de datos hay cuadros de artistas que le gustan al usuario, añadirlos a la ruta
-        artistas = self.user_to_recommend.interessos_autor
-
-
-        # Si en la base de datos hay cuadros de estilos que le gustan al usuario, añadirlos a la ruta
-
-
-
         # Ajustar la duración de la ruta
         temps_user_to_recommend = self.user_to_recommend.hores * self.user_to_recommend.dies * 60
         temps_ruta = route['temps']
         
-        if temps_ruta > temps_user_to_recommend:
+        if temps_ruta > temps_user_to_recommend: # Si la ruta dura más de lo que el usuario quiere
             # traiem quadres menys rellevants de la ruta fins que la duració sigui menor
 
             pass
-        else:
-            # afegim quadres rellevants de la ruta fins que la duració sigui major
 
+        else: # Si la ruta dura menos de lo que el usuario quiere
+                # afegim quadres rellevants de la ruta fins que la duració sigui major
+            print("Ruta:", route)
+            print()
+            print("----"*30)
+            print()
+            """
+            Ajusta la ruta recomendada a las preferencias del nuevo usuario.
+            """
+            # Ajustar los artistas y estilos de la ruta 
+            # Si en la base de datos hay cuadros de artistas que le gustan al usuario, añadirlos a la ruta
+            artistas = self.user_to_recommend.interessos_autor
+            print("Artistas:", artistas)
+            quadres_artistas = [quadre for quadre in self.quadres if quadre.autor in artistas]
+
+            for quadre in quadres_artistas:
+                
+                if quadre not in route['quadres']:
+                    route['quadres'].append(quadre)
+
+            # Si en la base de datos hay cuadros de estilos que le gustan al usuario, añadirlos a la ruta
             pass
 
         if route['puntuacio'] < 3:
