@@ -1,7 +1,7 @@
 import streamlit as st
 from helpers.ui_questions import ask_yes_or_no, ask_question_numerical, ask_question
 
-def render(df):
+def render():
     st.header("General Information")
     st.session_state.first_visit = ask_yes_or_no("Is this your first time visiting the museum?")
     st.session_state.visitas = 0 if st.session_state.first_visit else ask_question_numerical("How many times have you been here before?", 1, 10)
