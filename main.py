@@ -1,9 +1,10 @@
 import streamlit as st
 from helpers.database import load_database
-from pages.general_info import render as general_info
-from pages.personal_bg import render as personal_bg
-from pages.art_quiz import render as art_quiz
-from pages.interests import render as interests
+from blocs.general_info import render as general_info
+from blocs.personal_bg import render as personal_bg
+from blocs.art_quiz import render as art_quiz
+from blocs.interests import render as interests
+from blocs.route import render as ruta
 
 # Inicializar paso actual si no existe
 if "step" not in st.session_state:
@@ -19,15 +20,12 @@ def go_back():
 # Cargar datos necesarios
 df = load_database()
 
-# Layout para evitar la barra lateral
-#st.set_page_config(layout="wide")
-
 # Control de flujo continuo basado en `st.session_state.step`
 def render_page():
     step = st.session_state.step
 
     if step == 0:
-        general_info(df)  # Página 1: General Information
+        general_info()  # Página 1: General Information
         st.button("Next", on_click=go_next)
     elif step == 1:
         personal_bg()  # Página 2: Personal Background
@@ -49,9 +47,10 @@ def render_page():
         with col1:
             st.button("Back", on_click=go_back)
         with col2:
-            st.button("Next", on_click=go_next)
+            st.button("Finish", on_click=go_next)
     elif step == 4:
         st.write("Recommended Route Page")  # Aquí puedes añadir la lógica de la última página
+        ruta()
         st.button("Back", on_click=go_back)
 
 # Asegurarse de renderizar la página correcta
