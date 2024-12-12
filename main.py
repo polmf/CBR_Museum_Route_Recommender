@@ -1,32 +1,58 @@
 import streamlit as st
-from ui_blocks import render_block
-import pandas as pd
+from helpers.database import load_database
+from pages.general_info import render as general_info
+from pages.personal_bg import render as personal_bg
+from pages.art_quiz import render as art_quiz
+from pages.interests import render as interests
 
-def load_database():
-    df = pd.read_csv("artworks_data/artworks_final.csv")
-    return df
+# Inicializar paso actual si no existe
+if "step" not in st.session_state:
+    st.session_state.step = 0
 
-# Función auxiliar para obtener valores únicos de una columna
-def get_unique_options(df, column_name):
-    return df[column_name].dropna().unique().tolist()
+# Funciones para manejar cambios de paso
+def go_next():
+    st.session_state.step += 1
 
-def main_nou_cas():
-    
-    df = load_database()
+def go_back():
+    st.session_state.step -= 1
 
-    options_autor = get_unique_options(df, "Artist")
-    options_estils = get_unique_options(df, "Style")
-    options_type = get_unique_options(df, "Classification")
-    
-    st.title("Museum Visitor Questionnaire")
+# Cargar datos necesarios
+df = load_database()
 
-    if "block" not in st.session_state:
-        st.session_state.block = 1
+# Layout para evitar la barra lateral
+#st.set_page_config(layout="wide")
 
-    render_block(st.session_state.block, options_autor, options_estils, options_type)
+# Control de flujo continuo basado en `st.session_state.step`
+def render_page():
+    step = st.session_state.step
 
-    if st.session_state.block == 6:
-        st.write("Thank you for completing the questionnaire!")
+    if step == 0:
+        general_info(df)  # Página 1: General Information
+        st.button("Next", on_click=go_next)
+    elif step == 1:
+        personal_bg()  # Página 2: Personal Background
+        col1, col2 = st.columns(2)
+        with col1:
+            st.button("Back", on_click=go_back)
+        with col2:
+            st.button("Next", on_click=go_next)
+    elif step == 2:
+        art_quiz()  # Página 3: Art Quiz
+        col1, col2 = st.columns(2)
+        with col1:
+            st.button("Back", on_click=go_back)
+        with col2:
+            st.button("Next", on_click=go_next)
+    elif step == 3:
+        interests(df)  # Página 4: Interests
+        col1, col2 = st.columns(2)
+        with col1:
+            st.button("Back", on_click=go_back)
+        with col2:
+            st.button("Next", on_click=go_next)
+    elif step == 4:
+        st.write("Recommended Route Page")  # Aquí puedes añadir la lógica de la última página
+        st.button("Back", on_click=go_back)
 
-if __name__ == "__main__":
-    main_nou_cas()
+# Asegurarse de renderizar la página correcta
+render_page()
