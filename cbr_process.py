@@ -6,6 +6,20 @@ from CBR_ciclo.Retener import Retener
 import random 
 import streamlit as st
 
+# with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
+#         quadres_data = json.load(f_quadres)
+#         quadres = [Quadre.from_dict(data) for data in quadres_data]
+
+#     # Leer y convertir el archivo de las sales
+#     with open('data/sales.json', 'r', encoding='utf-8') as f_sales:
+#         sales_data = json.load(f_sales)
+#         sales = {sala_id: Sala.from_dict(data) for sala_id, data in sales_data.items()}
+
+#     # Leer y convertir el archivo de los autores
+#     with open('data/autors.json', 'r', encoding='utf-8') as f_autores:
+#         autores_data = json.load(f_autores)
+#         autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
+
 def handle_cbr_process():
     # user_to_recommend = Visitant(
     #     visites=st.session_state.visitas,
