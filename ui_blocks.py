@@ -2,7 +2,7 @@ import streamlit as st
 from ui_questions import ask_yes_or_no, ask_question_numerical, ask_question, ask_multiple_options
 from cbr_process import handle_cbr_process
 
-def render_block(block):
+def render_block(block, options_autor, options_estils, options_type):
     if block == 1:
         st.header("Block 1: General Information")
         first_visit = ask_yes_or_no("Is this your first time visiting the museum?")
@@ -76,24 +76,18 @@ def render_block(block):
         st.header("Block 4: Interests")
         interessos_autor = ask_multiple_options(
             "Which artists interest you the most? (Choose up to 3)",
-            [
-                "ignacio-pinazo-camarlench", "fillol-granell-antonio", "federico-de-madrazo",
-                "diego-rodriguez-de-silva-y-velazquez", "tiziano-vecellio", "joaquin-sorolla",
-                "fiodor-rokotov", "peter-paul-rubens", "rembrandt-van-rijn", "pieter-bruegel-el-vell",
-                "j-m-w-turner", "leonardo-da-vinci", "rosa-bonheur", "winslow-homer",
-                "edouard-vuillard", "charles-burchfield", "ben-shahn", "sandro-botticelli",
-                "salvador-dali", "edvard-munch", "edouard-manet", "hieronymus-bosch",
-                "johannes-vermeer", "eugene-delacroix", "not-sure"
-            ],
+            options_autor,
             3
         )
 
         interessos_estils = ask_multiple_options(
             "Which styles interest you the most? (Choose up to 3)",
-            [
-                "modernisme", "romanticisme", "barroc", "renaixement", "impressionisme",
-                "realisme", "contemporani", "surrealisme", "expressionisme", "not-sure"
-            ],
+            options_estils,
+            3
+        )
+        interessos_tipus = ask_multiple_options(
+            "Which of the following type art interest you the most? (Choose up to 3)",
+            options_type,
             3
         )
 
@@ -106,6 +100,7 @@ def render_block(block):
                 if st.button("Finish", key="block4_finish"):
                     st.session_state.interessos_autor = interessos_autor
                     st.session_state.interessos_estils = interessos_estils
+                    st.session_state.interessos_tipus = interessos_tipus
                     st.session_state.block = 5
             else:
                 st.warning("Please select up to 3 interests in each category.")
