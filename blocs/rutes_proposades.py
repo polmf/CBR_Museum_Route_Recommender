@@ -39,7 +39,7 @@ def mostrar_videos(dia):
 # Función para renderizar la página con los videos de las tres rutas
 def render():
     # Día seleccionado
-    dia = st.slider("Selecciona el día", min_value=1, max_value=5, step=1, value=1)
+    dia = st.slider("Selecciona el día", min_value=1, max_value=st.session_state.dies, step=1, value=1)
     
     # Llamamos a la función que muestra los videos de las tres rutas
     mostrar_videos(dia)

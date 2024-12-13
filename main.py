@@ -39,18 +39,30 @@ if "step" not in st.session_state:
 # Funciones para manejar cambios de paso
 def go_next():
     st.session_state.step += 1
+  
+def go_next_d1():
+    st.session_state.druta = 1
+    st.session_state.step += 1
+
+def go_next_d2():
+    st.session_state.druta = 2
+    st.session_state.step += 1
+
+def go_next_d3():
+    st.session_state.druta = 3
+    st.session_state.step += 1
     
 def go_next_1():
     st.session_state.ruta = 1
-    st.session_state.step += 1
+    st.session_state.step += 2
 
 def go_next_2():
     st.session_state.ruta = 2
-    st.session_state.step += 1
+    st.session_state.step += 2
 
 def go_next_3():
     st.session_state.ruta = 3
-    st.session_state.step += 1
+    st.session_state.step += 2
 
 def go_back():
     st.session_state.step -= 1
@@ -108,7 +120,8 @@ def render_page():
         # Crear un contenedor vacío para centrar el spinner y el botón
         """with st.spinner('Loading...'):
             # Asegúrate de que el spinner se muestra mientras se ejecuta la función
-            fer_rutes()  # Llamada a tu función"""
+            rutes_recomenades = cbr ()
+            fer_rutes(rutes_recomenades)  # Llamada a tu función"""
         
         # Crear columnas para centrar el botón
         col1, col2, col3 = st.columns([1, 4, 1])  # 4 es el ancho de la columna central
@@ -119,10 +132,17 @@ def render_page():
     elif step == 5:
         # Paso 4: Selección de la ruta
         st.header("Elige tu ruta")
-        rutes_recomenades()  # Llamamos la función que renderiza las rutas
-
         # Mostrar botones para seleccionar las rutas
         col1, col2, col3 = st.columns(3)
+        with col1:
+            st.button("Detalles Ruta 1", on_click=go_next_d1)  # Guardar ruta seleccionada
+        with col2:
+            st.button("Detalles Ruta 2", on_click=go_next_d2)  # Guardar ruta seleccionada
+        with col3:
+            st.button("Detalles Ruta 3", on_click=go_next_d3)
+        
+        rutes_recomenades()  # Llamamos la función que renderiza las rutas
+
         with col1:
             st.button("Ruta 1", on_click=go_next_1)  # Guardar ruta seleccionada
         with col2:
@@ -131,16 +151,29 @@ def render_page():
             st.button("Ruta 3", on_click=go_next_3)  # Guardar ruta seleccionada
 
     elif step == 6:
+        
+        if st.session_state.druta == 1:
+            #detalls_ruta(rutes_recomenades, 1)
+            pass
+        elif st.session_state.druta == 2:
+            #detalls_ruta(rutes_recomenades, 2)
+            pass
+        elif st.session_state.druta == 3:
+            #detalls_ruta(rutes_recomenades, 3)
+            pass
         # Paso 5: Mostrar la ruta seleccionada
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.button("Back", on_click=go_back)
+        
+    elif step == 7:
         if st.session_state.ruta:
             # Mostrar la ruta seleccionada
             st.write(f"Ruta seleccionada: {st.session_state.ruta}")
             # Llamamos a la función render de route_page.py para mostrar la ruta seleccionada
-            col1, col2 = st.columns(2)
-            with col1:
-                st.button("Back", on_click=go_back)
-            with col2:
+            col1, col2, col3 = st.columns(3)
+            with col3:
                 st.button("Finish", on_click=go_next)
-
+        
 # Asegurarse de renderizar la página correcta
 render_page()
