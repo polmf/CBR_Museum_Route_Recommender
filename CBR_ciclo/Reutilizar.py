@@ -58,7 +58,8 @@ class Reutilizar:
         return routes
     
     def add_artist(artistas, route):
-        if artistas 
+        if artistas :
+            pass
     
     def adapt_route_to_user_preferences(
         self,

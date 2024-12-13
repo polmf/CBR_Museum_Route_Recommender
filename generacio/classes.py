@@ -115,48 +115,48 @@ class Visitant:
         self.feedback = None
 
 
-   def get_visites(self):
-       return self.visites
+    def get_visites(self):
+        return self.visites
 
 
-   def get_companyia(self):
-       return self.companyia
+    def get_companyia(self):
+        return self.companyia
 
 
-   def get_dies(self):
-       return self.dies
+    def get_dies(self):
+        return self.dies
 
 
-   def get_hores(self):
-       return self.hores
+    def get_hores(self):
+        return self.hores
 
 
-   def get_edat(self):
-       return self.edat
+    def get_edat(self):
+        return self.edat
 
 
-   def get_estudis(self):
-       return self.estudis
+    def get_estudis(self):
+        return self.estudis
 
 
-   def get_coneixements(self):
-       return self.coneixements
+    def get_coneixements(self):
+        return self.coneixements
 
 
-   def get_quizz(self):
-       return self.quizz
+    def get_quizz(self):
+        return self.quizz
 
 
-   def get_interessos_autor(self):
-       return self.interessos_autor
+    def get_interessos_autor(self):
+        return self.interessos_autor
 
 
-   def get_interessos_estils(self):
-       return self.interessos_estils
+    def get_interessos_estils(self):
+        return self.interessos_estils
 
 
-   def get_feedback(self):
-       return self.feedback
+    def get_feedback(self):
+        return self.feedback
 
 
 
