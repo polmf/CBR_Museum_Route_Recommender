@@ -5,6 +5,20 @@ from classes import Visitant
 from generacio_instancies import assign_salas, parse_cuadros
 import numpy as np
 
+# Cargar la base de datos
+def load_database():
+    df = pd.read_csv("artworks_data/artworks_final.csv")
+    return df
+
+# Función auxiliar para obtener valores únicos de una columna
+def get_unique_options(df, column_name):
+    return df[column_name].dropna().unique().tolist()
+
+# Generar intereses aleatorios
+def generate_random_interests(options, max_choices=3):
+    return random.sample(options, random.randint(1, max_choices))
+
+
 # Rangs d'edat i pesos de la distribució segons les dades
 age_ranges = [(6, 17), (18, 24), (25, 34), (35, 44), (45, 54), (55, 64), (65, 99)]
 data = [
@@ -26,7 +40,7 @@ def generate_age():
     age = np.random.randint(age_ranges[selected_range][0], age_ranges[selected_range][1] + 1)
     return age
 
-def simulate_responses():
+def simulate_responses(options_autor, options_estils, options_type):
     first_visit = random.choice([True, False])
     visitas = 0 if first_visit else random.randint(1, 10)
 
@@ -34,9 +48,9 @@ def simulate_responses():
     edat = generate_age()
 
     if edat < 16:
-        companyia = random.choice(["couple", "family", "group"])
+        companyia = "group"
     else:
-        companyia = random.choice(["alone", "couple", "family", "group"])
+        companyia = random.choice(["alone", "group"])
 
     dies = random.randint(1, 10)
     hores = random.randint(1, 12)
@@ -50,23 +64,11 @@ def simulate_responses():
         quizz = random.randint(0, 6)  # Rango completo si no cumple los criterios
 
     quizz = int(round(quizz))  # Aseguramos que sea un entero
-    interessos_autor = random.sample(
-        [
-            "ignacio-pinazo-camarlench", "fillol-granell-antonio", "federico-de-madrazo",
-            "diego-rodriguez-de-silva-y-velazquez", "tiziano-vecellio", "joaquin-sorolla",
-            "fiodor-rokotov", "peter-paul-rubens", "rembrandt-van-rijn", "pieter-bruegel-el-vell",
-            "j-m-w-turner", "leonardo-da-vinci", "rosa-bonheur", "winslow-homer",
-            "edouard-vuillard", "charles-burchfield", "ben-shahn", "sandro-botticelli",
-            "salvador-dali", "edvard-munch", "edouard-manet", "hieronymus-bosch",
-            "johannes-vermeer", "eugene-delacroix", "not-sure"
-        ],
-        random.randint(1, 3)  # Máximo 3 intereses
-    )
-    interessos_estils = random.sample(
-        ["modernisme", "romanticisme", "barroc", "renaixement", "impressionisme",
-         "realisme", "contemporani", "surrealisme", "expressionisme", "not-sure"],
-        random.randint(1, 3)  # Máximo 3 intereses
-    )
+    
+    # Generar intereses aleatorios
+    interessos_autor = generate_random_interests(options_autor, 3)
+    interessos_estils = generate_random_interests(options_estils, 3)
+    interessos_type = generate_random_interests(options_type, 3)
 
     return Visitant(
         visites=visitas,
@@ -78,32 +80,51 @@ def simulate_responses():
         coneixement=coneixement,
         quizz=quizz,
         interessos_autor=interessos_autor,
-        interessos_estils=interessos_estils
+        interessos_estils=interessos_estils,
+        interessos_type=interessos_type
     )
 
-file_path = "data/cuadros.txt"  # Cambia la ruta al archivo real
-quadres, autores = parse_cuadros(file_path)
-salas = assign_salas(quadres)
+with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
+        quadres_data = json.load(f_quadres)
+        quadres = [Quadre.from_dict(data) for data in quadres_data]
+
+    # Leer y convertir el archivo de las sales
+with open('data/sales.json', 'r', encoding='utf-8') as f_sales:
+    sales_data = json.load(f_sales)
+    sales = {sala_id: Sala.from_dict(data) for sala_id, data in sales_data.items()}
+
+    # Leer y convertir el archivo de los autores
+with open('data/autors.json', 'r', encoding='utf-8') as f_autores:
+    autores_data = json.load(f_autores)
+    autors = {autor_nom: Autor.from_dict(data) for autor_nom, data in autores_data.items()}
+    
+df = load_database()
+    
+# Obtener opciones dinámicamente
+options_autor = get_unique_options(df, "Artist")
+options_estils = get_unique_options(df, "Style")
+options_type = get_unique_options(df, "Classification")
 
 def simulate_multiple_visits(id, num_visits):
     """
     Función para simular múltiples visitas de un usuario, generando una ruta y puntuación para cada una.
     """
-    visitante = simulate_responses()  # Generamos un visitante único
+    visitante = simulate_responses(options_autor, options_estils, options_type)  # Generamos un visitante único
     visitas = []
     
     for num_visita in range(num_visits):  # Generamos varios registros de visitas para el mismo visitante
         visitante.dies = random.randint(1, 10)  # Cambiamos el número de días de visita
         visitante.hores = random.randint(1, 8)
         if visitante.edat < 16:
-            visitante.companyia = random.choice(["couple", "family", "group"])
+            visitante.companyia = "group"
         else:
-            visitante.companyia = random.choice(["alone", "couple", "family", "group"])
+            visitante.companyia = random.choice(["alone", "group"])
 
-        show_visitor_classification(visitante)
+        rutes = rutes_predeterminades(quadres)
+        knowledge_factor = show_visitor_classification(visitante)
         ruta = recommend_route(visitante, rutes)  # Asignamos una ruta
-        refine_route(ruta, visitante, quadres)  # Refinamos la ruta basada en el visitante
-        show_paintings_by_rooms(ruta, salas, quadres, visitante)  # Mostramos las pinturas por salas
+        refine_route(ruta, rutes, visitante, quadres, knowledge_factor)  # Refinamos la ruta basada en el visitante
+        show_paintings_by_rooms(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
         puntuacio_ruta = int(random.gauss(3, 1.5))  # Puntuación aleatoria de la ruta (distribución normal)
         
         # clip para asegurar que la puntuación esté en el rango [0, 5]
@@ -122,9 +143,10 @@ def simulate_multiple_visits(id, num_visits):
             'visitant_quizz': visitante.quizz,
             'visitant_interessos_autor': visitante.interessos_autor,
             'visitant_interessos_estils': visitante.interessos_estils,
+            'visitant_interessos_tipus': visitante.interessos_type,
             'ruta': ruta.nom,
             'ruta_quadres': ruta.quadres,
-            'ruta_temps' : ruta.temps,
+            'ruta_temps' : round(ruta.temps),
             'puntuacio_ruta': puntuacio_ruta
         })
         
@@ -144,7 +166,7 @@ for visitant_id, _ in enumerate(range(num_visitants)):
 df = pd.DataFrame(base_de_casos)
 
 # Guardamos el DataFrame en un archivo CSV
-df.to_csv('data/base_de_dades.csv', index=False)
+df.to_csv('data/base_de_dades_final.csv', index=False)
 
 print("Base de datos guardada en 'base_de_dades.csv'")
 
