@@ -46,3 +46,20 @@ class Retener:
 
         self._base_de_casos_normalized = pd.concat([self._base_de_casos_normalized, self.user_to_recommend_normalized])
         self._base_de_casos_normalized.to_csv("data/base_de_casos_normalized.csv", index=False)
+
+    def save_route_to_recommend(self):
+        """
+        Guardar la nueva ruta en la base de datos.
+        """
+        self._base_de_casos = pd.concat([self._base_de_casos, self.user_to_recommend])
+        self._base_de_casos.to_csv("data/base_de_casos.csv", index=False)
+
+        self._base_de_casos_normalized = pd.concat([self._base_de_casos_normalized, self.user_to_recommend_normalized])
+        self._base_de_casos_normalized.to_csv("data/base_de_casos_normalized.csv", index=False)
+
+    def save_all(self):
+        """
+        Guardar tanto el nuevo usuario como la nueva ruta en la base de datos.
+        """
+        self.save_user_to_recommend()
+        self.save_route_to_recommend()
