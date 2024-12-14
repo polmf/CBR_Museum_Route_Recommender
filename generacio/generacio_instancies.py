@@ -90,7 +90,7 @@ def processar_base_dades(fitxer_csv, carpeta_desti):
             estil=fila.get("Style"),
             complexitat=complexitat,
             rellevancia=rellevancia,
-            constituent_id=fila.get("ConstituentID")  # Afegim ConstituentID
+            url=fila.get("ImageURL")
         )
         quadres.append(quadre)
 

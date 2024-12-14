@@ -28,7 +28,7 @@ class Autor:
 
 
 class Quadre:
-    def __init__(self, nom=None, dim_cm2=None, any=None, autor=None, estil=None, tipus=None, complexitat=None, rellevancia=None, constituent_id=None, sala=None):
+    def __init__(self, nom=None, dim_cm2=None, any=None, autor=None, estil=None, tipus=None, complexitat=None, rellevancia=None, url=None, sala=None):
         self.nom = nom
         self.dim_cm2 = dim_cm2
         self.any = any
@@ -37,7 +37,7 @@ class Quadre:
         self.tipus = tipus
         self.complexitat = complexitat
         self.rellevancia = rellevancia
-        self.constituent_id = constituent_id
+        self.url = url
         self.sala = sala
 
     def to_dict(self):

@@ -5,7 +5,8 @@ from blocs.general_info import render as general_info
 from blocs.personal_bg import render as personal_bg
 from blocs.art_quiz import render as art_quiz
 from blocs.interests import render as interests
-from blocs.rutes_proposades import render as rutes_recomenades  # Importamos la nueva función render de route_page
+from blocs.rutes_proposades import render as rutes_recomenades
+from blocs.detalls_ruta import render as detalls_ruta
 from helpers.mapa_museu import fer_rutes
 
 informative_phrases = [
@@ -152,15 +153,8 @@ def render_page():
 
     elif step == 6:
         
-        if st.session_state.druta == 1:
-            #detalls_ruta(rutes_recomenades, 1)
-            pass
-        elif st.session_state.druta == 2:
-            #detalls_ruta(rutes_recomenades, 2)
-            pass
-        elif st.session_state.druta == 3:
-            #detalls_ruta(rutes_recomenades, 3)
-            pass
+        detalls_ruta(st.session_state.druta)
+
         # Paso 5: Mostrar la ruta seleccionada
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -171,9 +165,12 @@ def render_page():
             # Mostrar la ruta seleccionada
             st.write(f"Ruta seleccionada: {st.session_state.ruta}")
             # Llamamos a la función render de route_page.py para mostrar la ruta seleccionada
+            detalls_ruta(st.session_state.ruta)
             col1, col2, col3 = st.columns(3)
             with col3:
                 st.button("Finish", on_click=go_next)
+    elif step == 8:
+        pass
         
 # Asegurarse de renderizar la página correcta
 render_page()
