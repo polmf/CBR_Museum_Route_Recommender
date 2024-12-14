@@ -22,8 +22,7 @@ class Reutilizar:
     """
 
     def __init__(self, user_to_recommend: Visitant, top_3_similar_cases: pd.DataFrame):
-        self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
-        # TODO
+        self._base_de_casos = pd.read_csv("datos.csv")
         with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
             quadres_data = json.load(f_quadres)
             quadres = [Quadre.from_dict(data) for data in quadres_data]
@@ -49,7 +48,8 @@ class Reutilizar:
                 'temps': user_data['ruta_temps'],
                 'puntuacio': user_data['puntuacio_ruta']
             }
-            
+            # TODO
+            # AÑADIR EN LA COLUMNA DE ULTIMA VISITA LA DATA ACTUAL Y EN LA DE VISITAS LA CANTIDAD DE VISITAS + 1
             if user_routes in routes:
                 routes[user_routes].append(ruta_info)
             else:
@@ -58,8 +58,11 @@ class Reutilizar:
         return routes
     
     def add_artist(artistas, route):
-        if artistas 
+        # Añaadir cuadros de artistas que le gustan al usuario
+        # TODO
     
+
+
     def adapt_route_to_user_preferences(
         self,
         route: Dict[str, Union[str, int]]
@@ -70,36 +73,21 @@ class Reutilizar:
         temps_ruta = route['temps']
         
         if temps_ruta > temps_user_to_recommend: # Si la ruta dura más de lo que el usuario quiere
-            # traiem quadres menys rellevants de la ruta fins que la duració sigui menor
-
+            # Quitamos cuadros poco relevantes de la ruta hasta que la duración sea menor
+            # TODO
             pass
 
         else: # Si la ruta dura menos de lo que el usuario quiere
-                # afegim quadres rellevants de la ruta fins que la duració sigui major
-            print("Ruta:", route)
-            print()
-            print("----"*30)
-            print()
-            """
-            Ajusta la ruta recomendada a las preferencias del nuevo usuario.
-            """
-            # Ajustar los artistas y estilos de la ruta 
-            # Si en la base de datos hay cuadros de artistas que le gustan al usuario, añadirlos a la ruta
-            artistas = self.user_to_recommend.interessos_autor
-            print("Artistas:", artistas)
-            quadres_artistas = [quadre for quadre in self.quadres if quadre.autor in artistas]
+            
+            # Mientras la duración de la ruta sea menor a la que el usuario quiere
+                # TODO
+            # Añadimos cuadros de artistas que le gustan al usuario
 
-            for quadre in quadres_artistas:
-                
-                if quadre not in route['quadres']:
-                    route['quadres'].append(quadre)
+            # Añadimos cuadros relevantes
 
-            # Si en la base de datos hay cuadros de estilos que le gustan al usuario, añadirlos a la ruta
-            pass
-
-        if route['puntuacio'] < 3:
-            # SI la puntuació de la ruta és baixa -> fer algo
-            pass
+        # EVALUAMOS LA RUTA CON NUESTRO AGENTE
+        # SI LA EVALUACIÓN DE LA RUTA ES BUENA O MALA
+        # LA AÑADIMOS A LA BASE DE CASOS
         
         return route
     

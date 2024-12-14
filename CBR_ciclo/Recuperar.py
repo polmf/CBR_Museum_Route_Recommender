@@ -2,15 +2,17 @@ import pandas as pd
 import numpy as np
 from transformations.functions import normalization
 from scipy.spatial.distance import cosine, hamming
+import json
+import os
 
 class Recuperar:
     """
     Clase que se encarga de recuperar casos previos para recomendar una visita.
     """
     
-    def __init__(self, user_to_recommend):
-        self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
-        self._base_de_casos_normalized = pd.read_csv("data/base_de_dades_normalized.csv")
+    def __init__(self, user_to_recommend, dades_normalitzades, dades):
+        self._base_de_casos_normalized = pd.DataFrame(dades_normalitzades)
+        self._base_de_casos = pd.DataFrame(dades)
         self.user_to_recommend_normalized = normalization(user_to_recommend, self._base_de_casos)
         self.num_cols = [
             'visitant_edat',
