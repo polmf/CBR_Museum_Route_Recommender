@@ -50,7 +50,7 @@ class Quadre:
             'tipus': self.tipus,
             'complexitat': self.complexitat,
             'relevancia': self.rellevancia,
-            'constituent_id': self.constituent_id,
+            'url': self.url,
             'sala': self.sala
         }
 
@@ -65,7 +65,7 @@ class Quadre:
             tipus=data.get('tipus'),
             complexitat=data.get('complexitat'),
             rellevancia=data.get('relevancia'),
-            constituent_id=data.get('constituent_id'),
+            url=data.get('url'),
             sala=data.get('sala')
         )
 

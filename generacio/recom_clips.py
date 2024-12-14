@@ -1017,7 +1017,7 @@ def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor):
                 for sala_painting, quadre_painting, time_painting in paintings_to_see:
                     if sala_painting not in day_info["rooms"]:
                         day_info["rooms"][sala_painting] = []
-                    day_info["rooms"][sala_painting].append((quadre_painting.nom, time_painting))
+                    day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))
 
                 days.append(day_info)  # Guardar la información del día
 
@@ -1033,7 +1033,7 @@ def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor):
         for sala_painting, quadre_painting, time_painting in paintings_to_see:
             if sala_painting not in day_info["rooms"]:
                 day_info["rooms"][sala_painting] = []
-            day_info["rooms"][sala_painting].append((quadre_painting.nom, time_painting))
+            day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))
 
         days.append(day_info)
         total_time_spent += time_spent_today  # Añadir el tiempo del último día al total
