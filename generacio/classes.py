@@ -1,4 +1,3 @@
-
 class Autor:
     def __init__(self, nom=None, epoca=None, estils=None, nacionalitat=None, es_troba_a=None):
         self.nom = nom
@@ -29,7 +28,7 @@ class Autor:
 
 
 class Quadre:
-    def __init__(self, nom=None, dim_cm2=None, any=None, autor=None, estil=None, tipus=None, complexitat=None, rellevancia=None, constituent_id=None, sala=None):
+    def __init__(self, nom=None, dim_cm2=None, any=None, autor=None, estil=None, tipus=None, complexitat=None, rellevancia=None, url=None, sala=None):
         self.nom = nom
         self.dim_cm2 = dim_cm2
         self.any = any
@@ -38,7 +37,7 @@ class Quadre:
         self.tipus = tipus
         self.complexitat = complexitat
         self.rellevancia = rellevancia
-        self.constituent_id = constituent_id
+        self.url = url
         self.sala = sala
 
     def to_dict(self):
@@ -51,7 +50,7 @@ class Quadre:
             'tipus': self.tipus,
             'complexitat': self.complexitat,
             'relevancia': self.rellevancia,
-            'constituent_id': self.constituent_id,
+            'url': self.url,
             'sala': self.sala
         }
 
@@ -66,7 +65,7 @@ class Quadre:
             tipus=data.get('tipus'),
             complexitat=data.get('complexitat'),
             rellevancia=data.get('relevancia'),
-            constituent_id=data.get('constituent_id'),
+            url=data.get('url'),
             sala=data.get('sala')
         )
 
@@ -115,35 +114,49 @@ class Visitant:
         self.interessos_type = interessos_type if interessos_type else []
         self.feedback = None
 
+
     def get_visites(self):
         return self.visites
+
 
     def get_companyia(self):
         return self.companyia
 
+
     def get_dies(self):
         return self.dies
+
 
     def get_hores(self):
         return self.hores
 
+
     def get_edat(self):
         return self.edat
+
 
     def get_estudis(self):
         return self.estudis
 
+
     def get_coneixements(self):
         return self.coneixements
+
 
     def get_quizz(self):
         return self.quizz
 
+
     def get_interessos_autor(self):
         return self.interessos_autor
+
 
     def get_interessos_estils(self):
         return self.interessos_estils
 
+
     def get_feedback(self):
         return self.feedback
+
+
+

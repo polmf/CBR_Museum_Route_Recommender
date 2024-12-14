@@ -1,10 +1,37 @@
 import streamlit as st
+import random
 from helpers.database import load_database
 from blocs.general_info import render as general_info
 from blocs.personal_bg import render as personal_bg
 from blocs.art_quiz import render as art_quiz
 from blocs.interests import render as interests
-from blocs.route import render as ruta
+from blocs.rutes_proposades import render as rutes_recomenades
+from blocs.detalls_ruta import render as detalls_ruta
+from helpers.mapa_museu import fer_rutes
+
+informative_phrases = [
+    "Creating your recommended museum routes... Hold tight!",
+    "Compiling the best museum tours just for you...",
+    "Crafting the perfect route... Almost there!",
+    "Organizing your museum journey... One moment!"
+]
+
+# Lista de frases divertidas o bromas para el usuario
+funny_phrases = [
+    "Don’t worry, the museum isn’t going anywhere! 😄",
+    "Meanwhile, we are finding the best route, don’t take a nap! 😉",
+    "Just a few more seconds... Try not to get lost in thought! 😜",
+    "It’s loading, but you can already start planning your future museum selfies! 😎"
+]
+
+# Función para mostrar las dos frases: una informativa y una divertida
+def display_funny_and_informative_messages():
+    # Elegir una frase aleatoria de cada grupo
+    informative_message = random.choice(informative_phrases)
+    funny_message = random.choice(funny_phrases)
+    
+    st.write(informative_message)  # Mostrar frase informativa
+    st.write(funny_message)        # Mostrar frase divertida
 
 # Inicializar paso actual si no existe
 if "step" not in st.session_state:
@@ -13,9 +40,37 @@ if "step" not in st.session_state:
 # Funciones para manejar cambios de paso
 def go_next():
     st.session_state.step += 1
+  
+def go_next_d1():
+    st.session_state.druta = 1
+    st.session_state.step += 1
+
+def go_next_d2():
+    st.session_state.druta = 2
+    st.session_state.step += 1
+
+def go_next_d3():
+    st.session_state.druta = 3
+    st.session_state.step += 1
+    
+def go_next_1():
+    st.session_state.ruta = 1
+    st.session_state.step += 2
+
+def go_next_2():
+    st.session_state.ruta = 2
+    st.session_state.step += 2
+
+def go_next_3():
+    st.session_state.ruta = 3
+    st.session_state.step += 2
 
 def go_back():
     st.session_state.step -= 1
+
+# Función para manejar la selección de la ruta
+def seleccionar_ruta(ruta):
+    st.session_state.ruta = ruta  # Guardar la ruta seleccionada
 
 # Cargar datos necesarios
 df = load_database()
@@ -24,34 +79,98 @@ df = load_database()
 def render_page():
     step = st.session_state.step
 
+    # Crear un espacio vacío para limpiar elementos anteriores
+    empty = st.empty()
+
     if step == 0:
         general_info()  # Página 1: General Information
-        st.button("Next", on_click=go_next)
+        col1, col2, col3 = st.columns(3)
+        with col3:
+            st.button("Next", on_click=go_next)
     elif step == 1:
         personal_bg()  # Página 2: Personal Background
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             st.button("Back", on_click=go_back)
-        with col2:
+        with col3:
             st.button("Next", on_click=go_next)
     elif step == 2:
         art_quiz()  # Página 3: Art Quiz
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             st.button("Back", on_click=go_back)
-        with col2:
+        with col3:
             st.button("Next", on_click=go_next)
     elif step == 3:
         interests(df)  # Página 4: Interests
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             st.button("Back", on_click=go_back)
-        with col2:
+        with col3:
             st.button("Finish", on_click=go_next)
     elif step == 4:
-        st.write("Recommended Route Page")  # Aquí puedes añadir la lógica de la última página
-        ruta()
-        st.button("Back", on_click=go_back)
+        # Limpiar la pantalla de la página anterior
+        empty.empty()
+        
+        # Mostrar el encabezado
+        st.header("Making Routes")
+        
+        # Mostrar las dos frases: una informativa y una divertida
+        display_funny_and_informative_messages()
+        
+        # Crear un contenedor vacío para centrar el spinner y el botón
+        """with st.spinner('Loading...'):
+            # Asegúrate de que el spinner se muestra mientras se ejecuta la función
+            rutes_recomenades = cbr ()
+            fer_rutes(rutes_recomenades)  # Llamada a tu función"""
+        
+        # Crear columnas para centrar el botón
+        col1, col2, col3 = st.columns([1, 4, 1])  # 4 es el ancho de la columna central
+        with col2:
+            # Este botón se centra en la columna 2
+            st.button("View Recommended Routes", on_click=go_next)
+            
+    elif step == 5:
+        # Paso 4: Selección de la ruta
+        st.header("Elige tu ruta")
+        # Mostrar botones para seleccionar las rutas
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.button("Detalles Ruta 1", on_click=go_next_d1)  # Guardar ruta seleccionada
+        with col2:
+            st.button("Detalles Ruta 2", on_click=go_next_d2)  # Guardar ruta seleccionada
+        with col3:
+            st.button("Detalles Ruta 3", on_click=go_next_d3)
+        
+        rutes_recomenades()  # Llamamos la función que renderiza las rutas
 
+        with col1:
+            st.button("Ruta 1", on_click=go_next_1)  # Guardar ruta seleccionada
+        with col2:
+            st.button("Ruta 2", on_click=go_next_2)  # Guardar ruta seleccionada
+        with col3:
+            st.button("Ruta 3", on_click=go_next_3)  # Guardar ruta seleccionada
+
+    elif step == 6:
+        
+        detalls_ruta(st.session_state.druta)
+
+        # Paso 5: Mostrar la ruta seleccionada
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.button("Back", on_click=go_back)
+        
+    elif step == 7:
+        if st.session_state.ruta:
+            # Mostrar la ruta seleccionada
+            st.write(f"Ruta seleccionada: {st.session_state.ruta}")
+            # Llamamos a la función render de route_page.py para mostrar la ruta seleccionada
+            detalls_ruta(st.session_state.ruta)
+            col1, col2, col3 = st.columns(3)
+            with col3:
+                st.button("Finish", on_click=go_next)
+    elif step == 8:
+        pass
+        
 # Asegurarse de renderizar la página correcta
 render_page()
