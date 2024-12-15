@@ -246,7 +246,7 @@ def get_unique_options(df, column_name):
 def yes_or_no(question):
     answer = input(question).strip().lower()
     while answer not in ["yes", "no"]:
-        print("Please answer with 'yes' or 'no'.")
+        #print("Please answer with 'yes' or 'no'.")
         answer = input(question).strip().lower()
     return answer == "yes"
 
@@ -269,7 +269,7 @@ def ask_question(question, options):
     return answer
 
 def ask_multiple_choice(question, correct_answer, options):
-    print(question)
+    #print(question)
     response = input(f"Your answer ({', '.join(options)}): ").strip().lower()
     while response not in options:
         print(f"Invalid answer. Choose one of {', '.join(options)}.")
@@ -277,11 +277,11 @@ def ask_multiple_choice(question, correct_answer, options):
     return response
 
 def ask_multiple_options(question, options, limit):
-    print(f"{question} ({', '.join(options)})")
+    #print(f"{question} ({', '.join(options)})")
     selected = input(f"Please select up to {limit} options: ").strip().lower().split(',')
     selected = [opt.strip() for opt in selected if opt.strip() in options]
     while len(selected) > limit:
-        print(f"You can select at most {limit} options.")
+        #print(f"You can select at most {limit} options.")
         selected = input(f"Please select up to {limit} options: ").strip().lower().split(',')
         selected = [opt.strip() for opt in selected if opt.strip() in options]
     return selected
@@ -289,9 +289,9 @@ def ask_multiple_options(question, options, limit):
 # Funciones para las preguntas del visitante
 
 def numero_dies_visites():
-    print("Hello! My name is Muse, and I'm here to make your experience in the museum better.")
-    print("In order to personalize your experience, I need you to answer a few questions.")
-    print("It will only take a couple of minutes. Ready? Let's go!")
+    #print("Hello! My name is Muse, and I'm here to make your experience in the museum better.")
+    #print("In order to personalize your experience, I need you to answer a few questions.")
+    #print("It will only take a couple of minutes. Ready? Let's go!")
     first_visit = yes_or_no("Is this your first time visiting the museum (yes/no)? ")
     return first_visit
 
@@ -321,8 +321,8 @@ def art_knowledge():
 
 # Quiz logic
 def start_quiz():
-    print("Next, let's get ready for a fun little quiz to see how much you know about art!")
-    print("No pressure—this is all about learning and having a good time.")
+    #print("Next, let's get ready for a fun little quiz to see how much you know about art!")
+    #print("No pressure—this is all about learning and having a good time.")
     score = 0
     questions = [
         ("Which of these artists is famous for cutting off his own ear? (a) Van Gogh (b) Picasso (c) Monet", "a", ["a", "b", "c"]),
@@ -336,12 +336,13 @@ def start_quiz():
         response = ask_multiple_choice(question, correct_answer, options)
         if response == correct_answer:
             score += 1
-            print("Correct!")
+            #print("Correct!")
         else:
-            print("Incorrect.")
-        print(f"Your current score is: {score}")
-    print("That's the end of our art adventure quiz!")
-    print(f"Your final score is: {score}")
+            #print("Incorrect.")
+            pass
+        #print(f"Your current score is: {score}")
+    #print("That's the end of our art adventure quiz!")
+    #print(f"Your final score is: {score}")
     return score
 
 # Interests
@@ -362,9 +363,9 @@ def interests_type(df):
 
 # Función para reunir la información del visitante
 def gather_visitor_info(df):
-    print("Hello! My name is Muse, and I'm here to make your experience in the museum better.")
-    print("In order to personalize your experience, I need you to answer a few questions.")
-    print("It will only take a couple of minutes. Ready? Let's go!")
+    #print("Hello! My name is Muse, and I'm here to make your experience in the museum better.")
+    #print("In order to personalize your experience, I need you to answer a few questions.")
+    #print("It will only take a couple of minutes. Ready? Let's go!")
 
     first_visit = yes_or_no("Is this your first time visiting the museum (yes/no)? ")
     visitas = primera_visita(first_visit)  # Número de visitas previas
@@ -411,12 +412,12 @@ def classify_museum(number_visits):
     else:
         category_museum = "Expert"
 
-    print("Thank you for completing the quiz! I hope you have enjoyed it.")
-    print("I have been creating a gallery with all of the information you have provided me with.")
-    print("Let's look into the conclusions I've gotten to.")
-    print()
-    print(f"Based on the times you've visited the museum, you are {category_museum}.")
-    print()
+    # print("Thank you for completing the quiz! I hope you have enjoyed it.")
+    # print("I have been creating a gallery with all of the information you have provided me with.")
+    # print("Let's look into the conclusions I've gotten to.")
+    # print()
+    # print(f"Based on the times you've visited the museum, you are {category_museum}.")
+    # print()
 
     return category_museum
 
@@ -431,8 +432,8 @@ def classify_age(age):
     else:
         category_age = "Senior"
 
-    print(f"Based on your age, you are a {category_age}.")
-    print()
+    # print(f"Based on your age, you are a {category_age}.")
+    # print()
 
     return category_age
 
@@ -472,9 +473,9 @@ def evaluate_knowledge(visitante):
         category_knowledge = "Expert"
 
     total_score_rounded = round(total_score, 3)
-    print(f"According to your art knowledge self-evaluation, quiz results, and art studies, "
-          f"you are a {category_knowledge} with a score of {total_score_rounded}.")
-    print()
+    # print(f"According to your art knowledge self-evaluation, quiz results, and art studies, "
+    #       f"you are a {category_knowledge} with a score of {total_score_rounded}.")
+    # print()
 
     return category_knowledge, total_score_rounded
 
@@ -489,11 +490,11 @@ def show_visitor_classification(visitante):
     category_knowledge, total_score = evaluate_knowledge(visitante)
 
     # Mostrar todos los resultados juntos
-    print("\n--- Final Results ---")
-    print(f"Visitor's museum classification: {category_museum}")
-    print(f"Visitor's age classification: {category_age}")
-    print(f"Visitor's knowledge classification: {category_knowledge}")
-    print(f"Total Knowledge Score: {total_score}")
+    # print("\n--- Final Results ---")
+    # print(f"Visitor's museum classification: {category_museum}")
+    # print(f"Visitor's age classification: {category_age}")
+    # print(f"Visitor's knowledge classification: {category_knowledge}")
+    # print(f"Total Knowledge Score: {total_score}")
     
     knowledge_factor = (
         1. if category_knowledge <= "Novice" else
@@ -754,7 +755,7 @@ def calculate_route_scores(visitant, category_museum, category_age, category_kno
     final_route_name = random.choice(options_with_max_score)
     # Selecció final de la millor ruta
     #final_route_name = max(scores, key=scores.get)
-    print(f"La ruta recomanada segons les teves preferències és: {final_route_name}")
+    #print(f"La ruta recomanada segons les teves preferències és: {final_route_name}")
 
     for ruta in rutes:
         if ruta.nom == final_route_name:

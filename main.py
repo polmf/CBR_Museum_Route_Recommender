@@ -65,6 +65,11 @@ def go_next_3():
     st.session_state.ruta = 3
     st.session_state.step += 2
 
+def go_final(evaluation):
+    st.session_state.evaluation = evaluation
+    st.success(f"Thank you for rating!")
+    st.session_state.step += 1
+
 def go_back():
     st.session_state.step -= 1
 
@@ -75,7 +80,7 @@ def seleccionar_ruta(ruta):
 # Cargar datos necesarios
 df = load_database()
 
-# Control de flujo continuo basado en `st.session_state.step`
+# Control de flujo continuo basado en st.session_state.step
 def render_page():
     step = st.session_state.step
 
@@ -170,7 +175,14 @@ def render_page():
             with col3:
                 st.button("Finish", on_click=go_next)
     elif step == 8:
-        pass
+        st.header("Route Evaluation")
+        # Allow the user to rate the selected route from 1 to 5
+        evaluation = st.slider("Rate the selected route (1: Very bad, 5: Excellent):", 1, 5, 3)
+        st.button("Submit Rating", on_click=go_final(evaluation))
         
+    elif step == 9:
+        st.header("Goodbye!")
+        st.write("Thank you for exploring the museum with us! We hope you enjoyed your experience.")
+        st.write("Feel free to come back anytime.")
 # Asegurarse de renderizar la página correcta
 render_page()

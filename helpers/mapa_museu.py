@@ -14,14 +14,20 @@ def generate_museum_layout(rows=12, cols=9):
     return layout
 
 # Crear el museu base amb sales i passadissos
-def draw_museum(ax, MUSEU_LAYOUT):
+def draw_museum(ax, MUSEU_LAYOUT, highlight_room=None):
     """
-    Dibuixa el museu amb sales i passadissos.
+    Dibuixa el museu amb sales i passadissos, destacant la sala especificada si es proporciona.
     """
     for sala in MUSEU_LAYOUT:
         x, y = sala["coords"]
         w, h = sala["size"]
-        rect = patches.Rectangle((x, y), w, h, linewidth=1, edgecolor="black", facecolor="lightgray")
+        
+        if sala["name"] == highlight_room:
+            # Resaltar la sala con un borde rojo si se selecciona
+            rect = patches.Rectangle((x, y), w, h, linewidth=2, edgecolor="red", facecolor="yellow")
+        else:
+            rect = patches.Rectangle((x, y), w, h, linewidth=1, edgecolor="black", facecolor="lightgray")
+        
         ax.add_patch(rect)
         ax.text(x + w / 2, y + h / 2, sala["name"], ha="center", va="center", fontsize=5)
 
@@ -43,6 +49,15 @@ def get_room_coords(room_name, MUSEU_LAYOUT):
             w, h = sala["size"]
             return x + w / 2, y + h / 2
     return None
+
+def mark_room_by_number(room_number, MUSEU_LAYOUT):
+    """
+    Marca una sala específica en el museu donant el número de sala i retorna el plot.
+    """
+    room_name = f"Sala {room_number}"
+    fig, ax = plt.subplots(figsize=(15, 20))
+    draw_museum(ax, MUSEU_LAYOUT, highlight_room=room_name)
+    return fig 
 
 # Crear un gif per cada dia
 def create_day_gif(day, route, idx, MUSEU_LAYOUT, output_dir="museum_videos"):
