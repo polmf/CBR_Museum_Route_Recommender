@@ -100,7 +100,7 @@ class Sala:
 
 
 class Visitant:
-    def __init__(self, visites=None, companyia=None, dies=None, hores=None, edat=None, estudis=None, coneixement=None, quizz=None, interessos_autor=None, interessos_estils=None, interessos_type= None):
+    def __init__(self, visites=None, companyia=None, dies=None, hores=None, edat=None, estudis=None, coneixement=None, quizz=None, interessos_autor=None, interessos_estils=None, interessos_tipus= None):
         self.visites = visites
         self.companyia = companyia
         self.dies = dies
@@ -111,7 +111,7 @@ class Visitant:
         self.quizz = quizz
         self.interessos_autor = interessos_autor if interessos_autor else ["not-sure"]
         self.interessos_estils = interessos_estils if interessos_estils else ["not-sure"]
-        self.interessos_tipus = interessos_type if interessos_type else ["not-sure"]
+        self.interessos_tipus = interessos_tipus if interessos_tipus else ["not-sure"]
         self.feedback = None
 
 

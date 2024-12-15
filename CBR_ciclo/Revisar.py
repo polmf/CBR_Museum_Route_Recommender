@@ -8,11 +8,12 @@ class Revisar:
     Recoger el feedback del usuario y, si no está satisfecho, realizar ajustes en las rutas futuras.
     """
 
-    def __init__(self, user_to_recommend, route_selected):
+    def __init__(self, user_to_recommend, route_selected, feedback):
         self.feedback = None
         self.user_to_recommend = user_to_recommend
         self.user_to_recommend_normalized = self.prepare_user_to_recommend()
         self.route_selected = route_selected
+        self.user_feedback = feedback
         self.agent_model = catboost.CatBoostRegressor()
         self.agent_model.load_model('CBR_ciclo/agent_model/best_catboost_model.cb')
 
@@ -43,14 +44,6 @@ class Revisar:
         
         return user_to_recommend
         
-    def collect_user_feedback(self):
-        """
-        Recoge el feedback del usuario sobre la ruta recomendada.
-        """
-        st.write("¿Estás satisfecho con la ruta recomendada?")
-        feedback = input("Introduce una puntuación del 1 al 5 a la ruta final recomendada (siendo 1 muy insatisfecho y 5 muy satisfecho): ")
-
-        return feedback
     
     def get_authors_from_route(self):
         """
@@ -98,9 +91,8 @@ class Revisar:
         """
         Obtiene el feedback del usuario y del agente.
         """
-        user_feedback = self.collect_user_feedback()
         agent_feedback = self.define_agent_feedback()
         
-        final_feedback = (user_feedback + agent_feedback) / 2
+        final_feedback = (self.user_feedback + agent_feedback) / 2
 
         return final_feedback

@@ -1,13 +1,16 @@
 import streamlit as st
 import random
-from helpers.database import load_database
+from generacio.classes import Visitant
 from blocs.general_info import render as general_info
 from blocs.personal_bg import render as personal_bg
 from blocs.art_quiz import render as art_quiz
 from blocs.interests import render as interests
 from blocs.rutes_proposades import render as rutes_recomenades
 from blocs.detalls_ruta import render as detalls_ruta
+from helpers.database import load_database
 from helpers.mapa_museu import fer_rutes
+from helpers.cbr_process import cbr_recuperar_reutilizar as cbr_1
+from helpers.cbr_process import cbr_revisar_retener as cbr_2
 
 informative_phrases = [
     "Creating your recommended museum routes... Hold tight!",
@@ -55,14 +58,17 @@ def go_next_d3():
     
 def go_next_1():
     st.session_state.ruta = 1
+    st.session_state.ruta_completa = st.session_state.rutes_recomenades[0]
     st.session_state.step += 2
 
 def go_next_2():
     st.session_state.ruta = 2
+    st.session_state.ruta_completa = st.session_state.rutes_recomenades[1]
     st.session_state.step += 2
 
 def go_next_3():
     st.session_state.ruta = 3
+    st.session_state.ruta_completa = st.session_state.rutes_recomenades[2]
     st.session_state.step += 2
 
 def go_final(evaluation):
@@ -115,7 +121,19 @@ def render_page():
             st.button("Finish", on_click=go_next)
     elif step == 4:
         # Limpiar la pantalla de la página anterior
-        empty.empty()
+        st.session_state.user_to_recommend = Visitant(
+            visites=st.session_state.visitas,
+            companyia=st.session_state.companyia,
+            dies=st.session_state.dies,
+            hores=st.session_state.hores,
+            edat=st.session_state.edat,
+            estudis=st.session_state.estudis,
+            coneixement=st.session_state.coneixement,
+            quizz=st.session_state.score,
+            interessos_autor=st.session_state.interessos_autor,
+            interessos_estils=st.session_state.interessos_estils,
+            interessos_tipus=st.session_state.interessos_tipus
+        )
         
         # Mostrar el encabezado
         st.header("Making Routes")
@@ -124,10 +142,11 @@ def render_page():
         display_funny_and_informative_messages()
         
         # Crear un contenedor vacío para centrar el spinner y el botón
-        """with st.spinner('Loading...'):
+        with st.spinner('Loading...'):
             # Asegúrate de que el spinner se muestra mientras se ejecuta la función
-            rutes_recomenades = cbr ()
-            fer_rutes(rutes_recomenades)  # Llamada a tu función"""
+            st.session_state.rutes_recomenades, st.session_state.most_similar_cluster = cbr_1()
+            print(st.session_state.rutes_recomandes[0])
+            #fer_rutes(st.session_state.rutes_recomenades)  # Llamada a tu función"""
         
         # Crear columnas para centrar el botón
         col1, col2, col3 = st.columns([1, 4, 1])  # 4 es el ancho de la columna central
@@ -181,6 +200,7 @@ def render_page():
         st.button("Submit Rating", on_click=go_final(evaluation))
         
     elif step == 9:
+        cbr_2()
         st.header("Goodbye!")
         st.write("Thank you for exploring the museum with us! We hope you enjoyed your experience.")
         st.write("Feel free to come back anytime.")
