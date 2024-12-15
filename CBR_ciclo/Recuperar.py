@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from transformations.functions import normalization
+from transformations.functions import normalize, user_to_pd
 from scipy.spatial.distance import cosine, hamming
 
 class Recuperar:
@@ -9,9 +9,10 @@ class Recuperar:
     """
     
     def __init__(self, user_to_recommend):
-        self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
+        self._base_de_casos = pd.read_json("data/base_de_dades_final.json")
         self._base_de_casos_normalized = pd.read_csv("data/base_de_dades_normalized.csv")
-        self.user_to_recommend_normalized = normalization(user_to_recommend, self._base_de_casos)
+        user_to_recommend = user_to_pd(user_to_recommend)
+        self.user_to_recommend_normalized = normalize(user_to_recommend, self._base_de_casos)
         self.num_cols = [
             'visitant_edat',
             'visitant_visites',
@@ -47,8 +48,8 @@ class Recuperar:
             for col in self.cols_to_compare:
                 clusters_representation[cluster][col] = data[col].mean()
                 if col in self.cat_cols:
-                    # mes de 0.1 es 1, sino 0
-                    clusters_representation[cluster][col] = 1 if clusters_representation[cluster][col] > 0.1 else 0
+                    # mes de 0.5 es 1, sino 0
+                    clusters_representation[cluster][col] = 1 if clusters_representation[cluster][col] > 0.5 else 0
 
         clusters_representation_df = pd.DataFrame(clusters_representation, index=self.cols_to_compare).T
 
@@ -146,6 +147,6 @@ class Recuperar:
         most_similar_cluster = self.get_most_similar_cluster()
         top_3_similar_cases = self.get_3_most_similar_cases(most_similar_cluster)
 
-        return top_3_similar_cases
+        return top_3_similar_cases, most_similar_cluster
 
     

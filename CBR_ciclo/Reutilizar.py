@@ -1,13 +1,9 @@
 from typing import Dict, List, Tuple, Union
 import pandas as pd
-from generacio.classes import Visitant
-from transformations.functions import normalization
-from scipy.spatial.distance import cosine, hamming
-from generacio.classes import Visitant
-from generacio.classes import Quadre
-from generacio.classes import Sala
-from generacio.classes import Autor
+from generacio.classes import Visitant, Quadre
 import json
+from datetime import datetime
+
 
 class Reutilizar:
     """
@@ -18,27 +14,23 @@ class Reutilizar:
     Si un usuario prefiere rutas de menos de 2 horas y la ruta recomendada dura 3 horas, 
     la ruta debe ser ajustada.
 
-    Se deberia de recomendar hasta 3 rutas diferentes para que el usuario pueda elegir la que más le guste.
+    Se debería recomendar hasta 3 rutas diferentes para que el usuario pueda elegir la que más le guste.
     """
 
     def __init__(self, user_to_recommend: Visitant, top_3_similar_cases: pd.DataFrame):
-        self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
-        # TODO
+        self._base_de_casos = pd.read_json("data/base_de_dades_final.json")
         with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:
             quadres_data = json.load(f_quadres)
             quadres = [Quadre.from_dict(data) for data in quadres_data]
         
         self.quadres = quadres
-
-
         self.top_3_similar_cases = top_3_similar_cases
         self.user_to_recommend = user_to_recommend
 
     def get_route_from_similar_cases(
         self,
-        top_3_similar_cases: List[Tuple[str, float]]
-        ):
-
+        top_3_similar_cases: List[Tuple[int, float]]
+    ):
         routes = {}
         for index, _ in top_3_similar_cases:
             user_data = self._base_de_casos.iloc[index]
@@ -49,7 +41,11 @@ class Reutilizar:
                 'temps': user_data['ruta_temps'],
                 'puntuacio': user_data['puntuacio_ruta']
             }
-            
+
+            # Añadir información de última visita y actualizar las visitas
+            self._base_de_casos.loc[index, 'ultima_visita'] = datetime.now().strftime("%Y-%m-%d")
+            self._base_de_casos.loc[index, 'recompte_utilitzat'] += 1
+
             if user_routes in routes:
                 routes[user_routes].append(ruta_info)
             else:
@@ -57,50 +53,69 @@ class Reutilizar:
 
         return routes
     
-    def add_artist(artistas, route):
-        if artistas :
-            pass
-    
+    def add_artist(self, artistas: List[str], route: Dict):
+        """
+        Añadir cuadros de artistas que le gustan al usuario.
+        """
+        cuadros_a_añadir = [
+            cuadro.nom for cuadro in self.quadres 
+            if cuadro.autor.nom in artistas and cuadro.nom not in route['quadres']
+        ]
+        route['quadres'].extend(cuadros_a_añadir)
+        return route
+
     def adapt_route_to_user_preferences(
         self,
         route: Dict[str, Union[str, int]]
-        ):
-
-        # Ajustar la duración de la ruta
+    ):
+        """
+        Adapta la ruta a las preferencias del usuario.
+        """
         temps_user_to_recommend = self.user_to_recommend.hores * self.user_to_recommend.dies * 60
         temps_ruta = route['temps']
         
-        if temps_ruta > temps_user_to_recommend: # Si la ruta dura más de lo que el usuario quiere
-            # traiem quadres menys rellevants de la ruta fins que la duració sigui menor
+        if temps_ruta > temps_user_to_recommend:  # Si la ruta dura más de lo que el usuario quiere
+            # Quitamos cuadros poco relevantes de la ruta hasta que la duración sea menor
+            cuadros_ordenados = sorted(
+                route['quadres'], 
+                key=lambda x: next((q.rellevancia for q in self.quadres if q.nom == x), 0)
+            )
+            while temps_ruta > temps_user_to_recommend and cuadros_ordenados:
+                cuadro_a_remover = cuadros_ordenados.pop(0)
+                route['quadres'].remove(cuadro_a_remover)
+                temps_ruta -= calculate_observation_time(
+                    next(q for q in self.quadres if q.nom == cuadro_a_remover),
+                    self.user_to_recommend.coneixement
+                )
 
-            pass
+        else:  # Si la ruta dura menos de lo que el usuario quiere
+            while temps_ruta < temps_user_to_recommend:
+                # Añadimos cuadros de artistas que le gustan al usuario
+                route = self.add_artist(self.user_to_recommend.interessos_autor, route)
 
-        else: # Si la ruta dura menos de lo que el usuario quiere
-                # afegim quadres rellevants de la ruta fins que la duració sigui major
-            print("Ruta:", route)
-            print()
-            print("----"*30)
-            print()
-            """
-            Ajusta la ruta recomendada a las preferencias del nuevo usuario.
-            """
-            # Ajustar los artistas y estilos de la ruta 
-            # Si en la base de datos hay cuadros de artistas que le gustan al usuario, añadirlos a la ruta
-            artistas = self.user_to_recommend.interessos_autor
-            print("Artistas:", artistas)
-            quadres_artistas = [quadre for quadre in self.quadres if quadre.autor in artistas]
+                # Añadimos cuadros relevantes
+                cuadros_relevantes = sorted(
+                    self.quadres, 
+                    key=lambda x: x.rellevancia, 
+                    reverse=True
+                )
+                for cuadro in cuadros_relevantes:
+                    if cuadro.nom not in route['quadres']:
+                        route['quadres'].append(cuadro.nom)
+                        temps_ruta += calculate_observation_time(cuadro, self.user_to_recommend.coneixement)
+                        if temps_ruta >= temps_user_to_recommend:
+                            break
 
-            for quadre in quadres_artistas:
-                
-                if quadre not in route['quadres']:
-                    route['quadres'].append(quadre)
 
-            # Si en la base de datos hay cuadros de estilos que le gustan al usuario, añadirlos a la ruta
-            pass
-
-        if route['puntuacio'] < 3:
-            # SI la puntuació de la ruta és baixa -> fer algo
-            pass
+        # Actualizar la base de casos
+        self._base_de_casos = self._base_de_casos.append({
+            'ruta': "Nueva ruta adaptada",
+            'ruta_temps': temps_ruta,
+            'puntacio_ruta': route['puntuacio'],
+            'cuadros_visitados': ", ".join(route['quadres']),
+            'ultima_visita': datetime.now().strftime("%Y-%m-%d"),
+            'visitant_visites': 1
+        }, ignore_index=True)
         
         return route
     
@@ -109,13 +124,41 @@ class Reutilizar:
         Recomienda hasta 3 rutas diferentes para que el usuario pueda elegir la que más le guste.
         """
         routes = self.get_route_from_similar_cases(self.top_3_similar_cases)
-        print("Rutes:", routes)
         routes = [
             self.adapt_route_to_user_preferences(route) 
             for route_list in routes.values() 
             for route in route_list
         ]
 
-        top_3_routes = sorted(routes, key=lambda x: x['NOVA PUNTUACIO'], reverse=True)[:3] # TO DO
+        return routes
 
-        return top_3_routes
+
+def calculate_observation_time(painting, knowledge_factor):
+    """
+    Calcula el tiempo de observación de un cuadro en función de su complejidad,
+    relevancia, tamaño y el factor de conocimiento del usuario.
+    """
+    complexity = painting.complexitat
+    dim_cm2 = painting.dim_cm2
+    relevance = painting.rellevancia
+
+    base_time = 1.0 if dim_cm2 < 5007 else 2.0
+
+    complexity_factor = (
+        1.1 if complexity <= 2 else
+        1.2 if complexity <= 4 else
+        1.3 if complexity <= 6 else
+        1.4 if complexity <= 8 else
+        1.5
+    )
+
+    relevance_factor = (
+        1.1 if relevance <= 2 else
+        1.2 if relevance <= 4 else
+        1.3 if relevance <= 6 else
+        1.4 if relevance <= 8 else
+        1.5
+    )
+    
+    total_time = base_time * complexity_factor * relevance_factor * knowledge_factor
+    return round(total_time)

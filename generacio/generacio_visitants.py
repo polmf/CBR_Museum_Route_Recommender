@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
 import pandas as pd
 from recom_clips import *
 import random
-from classes import Visitant
-from generacio_instancies import assign_salas, parse_cuadros
+from classes import Visitant, Quadre, Sala, Autor
 import numpy as np
+import json
 
 # Cargar la base de datos
 def load_database():
@@ -124,11 +125,15 @@ def simulate_multiple_visits(id, num_visits):
         knowledge_factor = show_visitor_classification(visitante)
         ruta = recommend_route(visitante, rutes)  # Asignamos una ruta
         refine_route(ruta, rutes, visitante, quadres, knowledge_factor)  # Refinamos la ruta basada en el visitante
-        show_paintings_by_rooms(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
+        dies_ruta = show_paintings_by_rooms_sense_prints(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
         puntuacio_ruta = int(random.gauss(3, 1.5))  # Puntuación aleatoria de la ruta (distribución normal)
         
         # clip para asegurar que la puntuación esté en el rango [0, 5]
         puntuacio_ruta = min(5, max(0, puntuacio_ruta))
+
+        data_ultim_us = (datetime.now() - timedelta(days=random.randint(0, 730))).strftime("%Y-%m-%d")
+
+        recompte_utilitzat = max(1, int(random.gammavariate(2, 2)))  # Al menos 1
         
         # Almacenamos la visita con la ruta y su puntuación
         visitas.append({
@@ -143,11 +148,14 @@ def simulate_multiple_visits(id, num_visits):
             'visitant_quizz': visitante.quizz,
             'visitant_interessos_autor': visitante.interessos_autor,
             'visitant_interessos_estils': visitante.interessos_estils,
-            'visitant_interessos_tipus': visitante.interessos_type,
+            'visitant_interessos_tipus': visitante.interessos_tipus,
             'ruta': ruta.nom,
-            'ruta_quadres': ruta.quadres,
-            'ruta_temps' : round(ruta.temps),
-            'puntuacio_ruta': puntuacio_ruta
+            'ruta_quadres': dies_ruta,
+            'ruta_quadres_list': ruta.quadres,
+            'ruta_temps': round(ruta.temps),
+            'puntuacio_ruta': puntuacio_ruta,
+            'data_ultim_us': data_ultim_us,
+            'recompte_utilitzat': recompte_utilitzat
         })
         
     return visitas
@@ -163,10 +171,10 @@ for visitant_id, _ in enumerate(range(num_visitants)):
     base_de_casos.extend(visitas)
 
 
-df = pd.DataFrame(base_de_casos)
+# Guardar en JSON
+output_path = 'data/base_de_dades_final.json'
 
-# Guardamos el DataFrame en un archivo CSV
-df.to_csv('data/base_de_dades_final.csv', index=False)
+with open(output_path, 'w', encoding='utf-8') as f:
+    json.dump(base_de_casos, f, indent=4, ensure_ascii=False)
 
-print("Base de datos guardada en 'base_de_dades.csv'")
-
+print(f"Base de datos guardada en '{output_path}'")

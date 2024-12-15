@@ -1,49 +1,51 @@
 import pandas as pd
-from transformations.functions import normalization
+from transformations.functions import normalize, mesura_utilitat
 
 class Retener:
     """
     Guardar las rutas o visitantes con sus nuevos atributos modificados,
     para poder usarlos en el futuro.
     """
-    # to do agent feedback
-    def __init__(self, user_to_recommend, feedback, recommended_route, agent_feedback):
-        self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
-        self._base_de_casos_normalized = pd.read_csv("data/base_de_casos_normalized.csv")
-        self.user_to_recommend = self.user_to_df(user_to_recommend, recommended_route, feedback)
-        self.user_to_recommend_normalized = normalization(user_to_recommend, self._base_de_casos)
+    def __init__(self, user_to_recommend, feedback, recommended_route, most_similar_cluster):
+        self.user_to_recommend = user_to_recommend
+        self.user_to_recommend_normalized = normalize(user_to_recommend)
+        self.feedback = feedback
+        self.recommended_route = recommended_route
+        self.most_similar_cluster = most_similar_cluster
+        self.base_de_casos = pd.read_json("data/base_de_dades_final.json")
+        self.base_de_casos_normalized = pd.read_json("data/base_de_dades_final_normalized.json")
 
-    def user_to_df(self, user_to_recommend, recommended_route, feedback):
+    def eval_saving(self):
         """
-        Convertir el objeto user_to_recommend a un DataFrame.
+        Evaluar si se guarda el caso o no.
         """
-        user_to_recommend = {
-            'visitante_id': id,
-            'visitant_edat': user_to_recommend.edat,
-            'visitant_visites': user_to_recommend.visites,
-            'visitant_dies': user_to_recommend.dies,
-            'visitant_hores': user_to_recommend.hores,
-            'visitant_companyia': user_to_recommend.companyia,
-            'visitant_estudis': user_to_recommend.estudis,
-            'visitant_coneixement': user_to_recommend.coneixements,
-            'visitant_quizz': user_to_recommend.quizz,
-            'visitant_interessos_autor': user_to_recommend.interessos_autor,
-            'visitant_interessos_estils': user_to_recommend.interessos_estils,
-            'ruta': recommended_route.nom,
-            'ruta_quadres': recommended_route.quadres,
-            'ruta_temps' : recommended_route.temps,
-            'puntuacio_ruta': feedback,
-            'puntuacio_agent': agent_feedback
-        }
-
-        return pd.DataFrame(user_to_recommend)
-    
+        if mesura_utilitat(
+            self.base_de_casos,
+            self.most_similar_cluster,
+            self.user_to_recommend,
+            self.recommended_route,
+            self.feedback
+        ):
+            self.save_user_to_recommend()
+            return True
+        
     def save_user_to_recommend(self):
         """
-        Guardar el nuevo usuario en la base de datos.
+        Guardar el usuario recomendado.
         """
-        self._base_de_casos = pd.concat([self._base_de_casos, self.user_to_recommend])
-        self._base_de_casos.to_csv("data/base_de_casos.csv", index=False)
+        self.user_to_recommend['puntuacio_ruta'] = self.feedback
+        self.user_to_recommend['ruta'] = self.recommended_route['ruta']
+        self.user_to_recommend['ruta_quadres'] = self.recommended_route['ruta_quadres']
+        self.user_to_recommend['ruta_temps'] = self.recommended_route['ruta_temps']
+        self.user_to_recommend['cluster'] = self.most_similar_cluster
+        self.user_to_recommend['visitante_id'] = self.base_de_casos['visitante_id'].max() + 1
+        
+        self.user_to_recommend_normalized['cluster'] = self.most_similar_cluster
 
-        self._base_de_casos_normalized = pd.concat([self._base_de_casos_normalized, self.user_to_recommend_normalized])
-        self._base_de_casos_normalized.to_csv("data/base_de_casos_normalized.csv", index=False)
+        self.base_de_casos = self.base_de_casos.append(self.user_to_recommend, ignore_index=True)
+        self.base_de_casos.to_json("data/base_de_dades_final.json", orient="records", lines=True)
+
+        self.base_de_casos_normalized = self.base_de_casos_normalized.append(self.user_to_recommend_normalized, ignore_index=True)
+        self.base_de_casos_normalized.to_json("data/base_de_dades_final_normalized.json", orient="records", lines=True)
+
+        return True
