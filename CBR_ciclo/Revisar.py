@@ -61,29 +61,9 @@ class Revisar:
         """
         Define el feedback del agente.
         """
-        autors_ruta = self.get_authors_from_route()
-        autors_user = self.user_to_recommend.interessos_autor
-
-        estils_ruta = self.route_selected['estils']
-        estils_user = self.user_to_recommend.interessos_estils
-        
-        objective_feedback = 0
-        for autor in autors_ruta:
-            if autor in autors_user:
-                objective_feedback += 1
-            
-        for estil in estils_ruta:
-            if estil in estils_user:
-                objective_feedback += 1
-
-        objective_feedback = (objective_feedback / (len(autors_ruta) + len(estils_ruta))) * 5
-
         # predict the feedback with the agent model
         agent_feedback = self.agent_model.predict(self.user_to_recommend_normalized)
 
-        agent_feedback = (agent_feedback + objective_feedback) / 2
-
-        
         return agent_feedback
     
 

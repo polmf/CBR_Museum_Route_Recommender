@@ -28,6 +28,14 @@ class Reutilizar:
         self.top_3_similar_cases = top_3_similar_cases
         self.user_to_recommend = user_to_recommend
 
+    def get_instancies(self, quadres_ruta):
+        instancies = []
+        for quadre_ruta in quadres_ruta:
+            for quadre in self.quadres:
+                if quadre_ruta == quadre.nom:
+                    instancies.append(quadre)
+        return instancies
+
     def get_route_from_similar_cases(
         self,
         top_3_similar_cases: List[Tuple[int, float]]
@@ -36,9 +44,11 @@ class Reutilizar:
         for index, _ in top_3_similar_cases:
             user_data = self._base_de_casos.iloc[index]
             user_routes = user_data['ruta']
+            instancies = self.get_instancies(user_data['ruta_quadres_list'])
             
             ruta_info = {
                 'quadres': user_data['ruta_quadres_list'],
+                'instancies': instancies,
                 'temps': user_data['ruta_temps'],
                 'puntuacio': user_data['puntuacio_ruta']
             }
@@ -59,8 +69,8 @@ class Reutilizar:
         Añadir cuadros de artistas que le gustan al usuario.
         """
         cuadros_a_añadir = [
-            cuadro.nom for cuadro in self.quadres 
-            if cuadro.autor.nom in artistas and cuadro.nom not in route['quadres']
+            cuadro for cuadro in self.quadres 
+            if cuadro.autor in artistas and cuadro.nom not in route['quadres']
         ]
         route['quadres'].extend(cuadros_a_añadir)
         return route
@@ -102,7 +112,7 @@ class Reutilizar:
                 )
                 for cuadro in cuadros_relevantes:
                     if cuadro.nom not in route['quadres']:
-                        route['quadres'].append(cuadro.nom)
+                        route['quadres'].append(cuadro)
                         temps_ruta += calculate_observation_time(cuadro, 1 + 0.04 * (self.user_to_recommend.coneixements - 1))
                         if temps_ruta >= temps_user_to_recommend:
                             break

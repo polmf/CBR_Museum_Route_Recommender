@@ -1,5 +1,7 @@
 import streamlit as st
 import random
+from generacio.recom_clips import Ruta
+from generacio.recom_clips import show_paintings_by_rooms_sense_prints as reestructura_ruta
 from generacio.classes import Visitant
 from blocs.general_info import render as general_info
 from blocs.personal_bg import render as personal_bg
@@ -145,8 +147,14 @@ def render_page():
         with st.spinner('Loading...'):
             # Asegúrate de que el spinner se muestra mientras se ejecuta la función
             st.session_state.rutes_recomenades, st.session_state.most_similar_cluster = cbr_1()
-            print(st.session_state.rutes_recomandes[0])
-            #fer_rutes(st.session_state.rutes_recomenades)  # Llamada a tu función"""
+            #print(st.session_state.rutes_recomenades[0])
+            st.session_state.rutes_recomenades_reconstrudides = []
+            for ruta in st.session_state.rutes_recomenades:
+                ruta_nova = Ruta(nom='Ruta_nova', instancies=ruta['instancies'])
+                ruta_restructurada = reestructura_ruta(ruta_nova, st.session_state.user_to_recommend, (1 + 0.04 * (st.session_state.coneixement - 1)))
+                st.session_state.rutes_recomenades_reconstrudides.append(ruta_restructurada)
+            print(st.session_state.rutes_recomenades_reconstrudides[0])
+            fer_rutes(st.session_state.rutes_recomenades_reconstrudides)  # Llamada a tu función"""
         
         # Crear columnas para centrar el botón
         col1, col2, col3 = st.columns([1, 4, 1])  # 4 es el ancho de la columna central

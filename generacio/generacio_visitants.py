@@ -13,7 +13,10 @@ def load_database():
 
 # Función auxiliar para obtener valores únicos de una columna
 def get_unique_options(df, column_name):
-    return df[column_name].dropna().unique().tolist()
+    unique_values = df[column_name].dropna().unique().tolist()
+    if 'not-sure' not in unique_values:
+        unique_values.append('not-sure')
+    return unique_values
 
 # Generar intereses aleatorios
 def generate_random_interests(options, max_choices=3):
@@ -82,7 +85,7 @@ def simulate_responses(options_autor, options_estils, options_type):
         quizz=quizz,
         interessos_autor=interessos_autor,
         interessos_estils=interessos_estils,
-        interessos_type=interessos_type
+        interessos_tipus=interessos_type
     )
 
 with open('data/quadres.json', 'r', encoding='utf-8') as f_quadres:

@@ -13,4 +13,4 @@ def ask_multiple_options(question, options, limit):
     selected = st.multiselect(question, options=options)
     if len(selected) > limit:
         st.warning(f"You can select up to {limit} options.")
-    return selected[:limit]
+    return selected[:limit] if selected else 'not-sure'
