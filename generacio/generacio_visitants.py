@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import pandas as pd
 from recom_clips import *
 import random
@@ -124,11 +125,15 @@ def simulate_multiple_visits(id, num_visits):
         knowledge_factor = show_visitor_classification(visitante)
         ruta = recommend_route(visitante, rutes)  # Asignamos una ruta
         refine_route(ruta, rutes, visitante, quadres, knowledge_factor)  # Refinamos la ruta basada en el visitante
-        show_paintings_by_rooms(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
+        dies_ruta = show_paintings_by_rooms_sense_prints(ruta, visitante, knowledge_factor)  # Mostramos las pinturas por salas
         puntuacio_ruta = int(random.gauss(3, 1.5))  # Puntuación aleatoria de la ruta (distribución normal)
         
         # clip para asegurar que la puntuación esté en el rango [0, 5]
         puntuacio_ruta = min(5, max(0, puntuacio_ruta))
+
+        data_ultim_us = (datetime.now() - timedelta(days=random.randint(0, 730))).strftime("%Y-%m-%d")
+
+        recompte_utilitzat = max(1, int(random.gammavariate(2, 2)))  # Al menos 1
         
         # Almacenamos la visita con la ruta y su puntuación
         visitas.append({
@@ -143,11 +148,14 @@ def simulate_multiple_visits(id, num_visits):
             'visitant_quizz': visitante.quizz,
             'visitant_interessos_autor': visitante.interessos_autor,
             'visitant_interessos_estils': visitante.interessos_estils,
-            'visitant_interessos_tipus': visitante.interessos_type,
+            'visitant_interessos_tipus': visitante.interessos_tipus,
             'ruta': ruta.nom,
-            'ruta_quadres': ruta.quadres,
+            'ruta_quadres': dies_ruta,
+            'ruta_quadres_list': ruta.quadres,
             'ruta_temps': round(ruta.temps),
-            'puntuacio_ruta': puntuacio_ruta
+            'puntuacio_ruta': puntuacio_ruta,
+            'data_ultim_us': data_ultim_us,
+            'recompte_utilitzat': recompte_utilitzat
         })
         
     return visitas

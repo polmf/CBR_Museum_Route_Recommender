@@ -9,7 +9,7 @@ class Recuperar:
     """
     
     def __init__(self, user_to_recommend):
-        self._base_de_casos = pd.read_csv("data/base_de_dades.csv")
+        self._base_de_casos = pd.read_json("data/base_de_dades_final.json")
         self._base_de_casos_normalized = pd.read_csv("data/base_de_dades_normalized.csv")
         user_to_recommend = user_to_pd(user_to_recommend)
         self.user_to_recommend_normalized = normalize(user_to_recommend, self._base_de_casos)

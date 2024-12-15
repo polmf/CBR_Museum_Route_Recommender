@@ -50,6 +50,7 @@ def normalize(
     cols_to_compare.remove('puntuacio_ruta')
     cols_to_compare.remove('visitante_id')
     cols_to_compare.remove('ruta_temps')
+    cols_to_compare.remove('cluster')
 
     for col in cols_to_compare:
         max_value = base_de_casos[col].max()
@@ -65,17 +66,17 @@ def user_to_pd(user_to_recommend: Visitant) -> pd.DataFrame:
     Convertir un objecte Visitant a un DataFrame de Pandas.
     """
     user_dict = {
-        "visites": user_to_recommend.visites,
-        "companyia": user_to_recommend.companyia,
-        "dies": user_to_recommend.dies,
-        "hores": user_to_recommend.hores,
-        "edat": user_to_recommend.edat,
-        "estudis": user_to_recommend.estudis,
-        "coneixement": user_to_recommend.coneixement,
-        "quizz": user_to_recommend.quizz,
-        "interessos_autor": user_to_recommend.interessos_autor,
-        "interessos_estils": user_to_recommend.interessos_estils,
-        "interessos_tipus": user_to_recommend.interessos_tipus,
+        "visitant_visites": user_to_recommend.visites,
+        "visitant_companyia": user_to_recommend.companyia,
+        "visitant_dies": user_to_recommend.dies,
+        "visitant_hores": user_to_recommend.hores,
+        "visitant_edat": user_to_recommend.edat,
+        "visitant_estudis": user_to_recommend.estudis,
+        "visitant_coneixement": user_to_recommend.coneixements,
+        "visitant_quizz": user_to_recommend.quizz,
+        "visitant_interessos_autor": user_to_recommend.interessos_autor,
+        "visitant_interessos_estils": user_to_recommend.interessos_estils,
+        "visitant_interessos_tipus": user_to_recommend.interessos_tipus,
     }
 
     return pd.DataFrame(user_dict, index=[0])

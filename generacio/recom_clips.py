@@ -864,7 +864,7 @@ def refine_route(route, rutes, visitante, all_paintings, knowledge_factor):
     # Find paintings by style and author interests
     paintings_by_style = [quadre for quadre in all_paintings if quadre.estil==visitante.interessos_estils ]
     paintings_by_author = [quadre for quadre in all_paintings if quadre.autor==visitante.interessos_autor ]
-    paintings_by_type = [quadre for quadre in all_paintings if quadre.tipus==visitante.interessos_type ]
+    paintings_by_type = [quadre for quadre in all_paintings if quadre.tipus==visitante.interessos_tipus ]
 
     # Add paintings to the route
     for ruta in rutes:

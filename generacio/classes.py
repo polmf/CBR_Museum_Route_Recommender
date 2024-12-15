@@ -109,9 +109,9 @@ class Visitant:
         self.estudis = estudis
         self.coneixements = coneixement
         self.quizz = quizz
-        self.interessos_autor = interessos_autor if interessos_autor else []
-        self.interessos_estils = interessos_estils if interessos_estils else []
-        self.interessos_type = interessos_type if interessos_type else []
+        self.interessos_autor = interessos_autor if interessos_autor else ["not-sure"]
+        self.interessos_estils = interessos_estils if interessos_estils else ["not-sure"]
+        self.interessos_tipus = interessos_type if interessos_type else ["not-sure"]
         self.feedback = None
 
 
