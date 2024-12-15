@@ -3,6 +3,7 @@ import pandas as pd
 from generacio.classes import Visitant, Quadre
 import json
 from datetime import datetime
+from generacio.recom_clips import calculate_observation_time
 
 
 class Reutilizar:
@@ -37,7 +38,7 @@ class Reutilizar:
             user_routes = user_data['ruta']
             
             ruta_info = {
-                'quadres': user_data['ruta_quadres'],
+                'quadres': user_data['ruta_quadres_list'],
                 'temps': user_data['ruta_temps'],
                 'puntuacio': user_data['puntuacio_ruta']
             }
@@ -85,7 +86,7 @@ class Reutilizar:
                 route['quadres'].remove(cuadro_a_remover)
                 temps_ruta -= calculate_observation_time(
                     next(q for q in self.quadres if q.nom == cuadro_a_remover),
-                    self.user_to_recommend.coneixement
+                    (1 + 0.04 * (self.user_to_recommend.coneixements - 1))
                 )
 
         else:  # Si la ruta dura menos de lo que el usuario quiere
@@ -102,21 +103,11 @@ class Reutilizar:
                 for cuadro in cuadros_relevantes:
                     if cuadro.nom not in route['quadres']:
                         route['quadres'].append(cuadro.nom)
-                        temps_ruta += calculate_observation_time(cuadro, self.user_to_recommend.coneixement)
+                        temps_ruta += calculate_observation_time(cuadro, 1 + 0.04 * (self.user_to_recommend.coneixements - 1))
                         if temps_ruta >= temps_user_to_recommend:
                             break
 
 
-        # Actualizar la base de casos
-        self._base_de_casos = self._base_de_casos.append({
-            'ruta': "Nueva ruta adaptada",
-            'ruta_temps': temps_ruta,
-            'puntacio_ruta': route['puntuacio'],
-            'cuadros_visitados': ", ".join(route['quadres']),
-            'ultima_visita': datetime.now().strftime("%Y-%m-%d"),
-            'visitant_visites': 1
-        }, ignore_index=True)
-        
         return route
     
     def recommend_routes(self):
@@ -132,33 +123,3 @@ class Reutilizar:
 
         return routes
 
-
-def calculate_observation_time(painting, knowledge_factor):
-    """
-    Calcula el tiempo de observación de un cuadro en función de su complejidad,
-    relevancia, tamaño y el factor de conocimiento del usuario.
-    """
-    complexity = painting.complexitat
-    dim_cm2 = painting.dim_cm2
-    relevance = painting.rellevancia
-
-    base_time = 1.0 if dim_cm2 < 5007 else 2.0
-
-    complexity_factor = (
-        1.1 if complexity <= 2 else
-        1.2 if complexity <= 4 else
-        1.3 if complexity <= 6 else
-        1.4 if complexity <= 8 else
-        1.5
-    )
-
-    relevance_factor = (
-        1.1 if relevance <= 2 else
-        1.2 if relevance <= 4 else
-        1.3 if relevance <= 6 else
-        1.4 if relevance <= 8 else
-        1.5
-    )
-    
-    total_time = base_time * complexity_factor * relevance_factor * knowledge_factor
-    return round(total_time)

@@ -27,7 +27,7 @@ def handle_cbr_process():
         hores=1,
         edat=30,
         estudis=True,
-        coneixements=4,
+        coneixement=4,
         quizz=5,
         interessos_autor=["not-sure"],
         interessos_estils=["not-sure"]
@@ -40,8 +40,11 @@ def handle_cbr_process():
     reutilizar = Reutilizar(user_to_recommend, top_3_similar_users)
     top_3_routes_recommended = reutilizar.recommend_routes()
 
-    st.write("Estas son las rutas recomendadas para ti:")
-    st.write(top_3_routes_recommended)
+
+
+    print("Estas son las rutas recomendadas para ti:")
+    print(len(top_3_routes_recommended))
+    print(top_3_routes_recommended)
 
     # que el usuario escoja una ruta
     st.write("Por favor, selecciona una de las rutas recomendadas.")

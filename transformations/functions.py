@@ -51,6 +51,7 @@ def normalize(
     cols_to_compare.remove('visitante_id')
     cols_to_compare.remove('ruta_temps')
     cols_to_compare.remove('cluster')
+    cols_to_compare.remove('recompte_utilitzat')
 
     for col in cols_to_compare:
         max_value = base_de_casos[col].max()
