@@ -1,4 +1,4 @@
-from classes import *
+from generacio.classes import *
 import random
 import json
 import pandas as pd
