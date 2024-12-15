@@ -1,4 +1,6 @@
+import pandas as pd
 import streamlit as st
+import catboost
 
 class Revisar:
     """
@@ -9,7 +11,37 @@ class Revisar:
     def __init__(self, user_to_recommend, route_selected):
         self.feedback = None
         self.user_to_recommend = user_to_recommend
+        self.user_to_recommend_normalized = self.prepare_user_to_recommend()
         self.route_selected = route_selected
+        self.agent_model = catboost.CatBoostRegressor()
+        self.agent_model.load_model('CBR_ciclo/agent_model/best_catboost_model.cb')
+
+    def prepare_user_to_recommend(self):
+
+        temps_total = self.user_to_recommend.dies * 24 + self.user_to_recommend.hores
+
+        # convert user_to_recommend to a DataFrame
+        user_to_recommend = {
+            'visitant_edat': self.user_to_recommend.edat,
+            'visitant_visites': self.user_to_recommend.visites,
+            'visitant_temps_total': temps_total,
+            'visitant_companyia': self.user_to_recommend.companyia,
+            'visitant_estudis': self.user_to_recommend.estudis,
+            'visitant_coneixement': self.user_to_recommend.coneixements,
+            'visitant_quizz': self.user_to_recommend.quizz,
+            'visitant_interessos_estils': self.user_to_recommend.interessos_estils,
+            'visitant_interessos_tipus': self.user_to_recommend.interessos_tipus,
+        }
+
+        user_to_recommend = pd.DataFrame(user_to_recommend)
+
+        user_to_recommend['visitant_interessos_estils'] = user_to_recommend['visitant_interessos_estils'].apply(
+            lambda x: x[0] if isinstance(x, list) else x)
+        
+        user_to_recommend['visitant_interessos_tipus'] = user_to_recommend['visitant_interessos_tipus'].apply(
+            lambda x: x[0] if isinstance(x, list) else x)
+        
+        return user_to_recommend
         
     def collect_user_feedback(self):
         """
@@ -18,7 +50,6 @@ class Revisar:
         st.write("¿Estás satisfecho con la ruta recomendada?")
         feedback = input("Introduce una puntuación del 1 al 5 a la ruta final recomendada (siendo 1 muy insatisfecho y 5 muy satisfecho): ")
 
-        
         return feedback
     
     def get_authors_from_route(self):
@@ -43,20 +74,22 @@ class Revisar:
         estils_ruta = self.route_selected['estils']
         estils_user = self.user_to_recommend.interessos_estils
         
-        agent_feedback = 0
+        objective_feedback = 0
         for autor in autors_ruta:
             if autor in autors_user:
-                agent_feedback += 1
+                objective_feedback += 1
             
         for estil in estils_ruta:
             if estil in estils_user:
-                agent_feedback += 1
+                objective_feedback += 1
 
-        agent_feedback = agent_feedback / (len(autors_ruta) + len(estils_ruta))
+        objective_feedback = (objective_feedback / (len(autors_ruta) + len(estils_ruta))) * 5
 
-        # es podria tmb utilitzar una xarxa neuronal per predir el feedback de l'usuari i
-        # si es diferencia molt del feedback de l'agent, es podria considerar un outlier
-        # i per tant, no tenir en compte el feedback de l'usuari
+        # predict the feedback with the agent model
+        agent_feedback = self.agent_model.predict(self.user_to_recommend_normalized)
+
+        agent_feedback = (agent_feedback + objective_feedback) / 2
+
         
         return agent_feedback
     

@@ -1,9 +1,9 @@
 import pandas as pd
 from recom_clips import *
 import random
-from classes import Visitant
-from generacio_instancies import assign_salas, parse_cuadros
+from classes import Visitant, Quadre, Sala, Autor
 import numpy as np
+import json
 
 # Cargar la base de datos
 def load_database():
@@ -146,7 +146,7 @@ def simulate_multiple_visits(id, num_visits):
             'visitant_interessos_tipus': visitante.interessos_type,
             'ruta': ruta.nom,
             'ruta_quadres': ruta.quadres,
-            'ruta_temps' : round(ruta.temps),
+            'ruta_temps': round(ruta.temps),
             'puntuacio_ruta': puntuacio_ruta
         })
         
@@ -163,10 +163,10 @@ for visitant_id, _ in enumerate(range(num_visitants)):
     base_de_casos.extend(visitas)
 
 
-df = pd.DataFrame(base_de_casos)
+# Guardar en JSON
+output_path = 'data/base_de_dades_final.json'
 
-# Guardamos el DataFrame en un archivo CSV
-df.to_csv('data/base_de_dades_final.csv', index=False)
+with open(output_path, 'w', encoding='utf-8') as f:
+    json.dump(base_de_casos, f, indent=4, ensure_ascii=False)
 
-print("Base de datos guardada en 'base_de_dades.csv'")
-
+print(f"Base de datos guardada en '{output_path}'")
