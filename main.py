@@ -173,24 +173,25 @@ def render_page():
             
     elif step == 5:
         # Paso 4: Selección de la ruta
-        st.header("Elige tu ruta")
-        # Mostrar botones para seleccionar las rutas
+        st.header("Choose your route")
+        # Display buttons to select routes
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.button("Detalles Ruta 1", on_click=go_next_d1)  # Guardar ruta seleccionada
+            st.button("Route 1 Details", on_click=go_next_d1)  # Save selected route
         with col2:
-            st.button("Detalles Ruta 2", on_click=go_next_d2)  # Guardar ruta seleccionada
+            st.button("Route 2 Details", on_click=go_next_d2)  # Save selected route
         with col3:
-            st.button("Detalles Ruta 3", on_click=go_next_d3)
-        
-        rutes_recomenades()  # Llamamos la función que renderiza las rutas
+            st.button("Route 3 Details", on_click=go_next_d3)
+
+        rutes_recomenades()  # Call the function that renders the routes
 
         with col1:
-            st.button("Ruta 1", on_click=go_next_1)  # Guardar ruta seleccionada
+            st.button("Route 1", on_click=go_next_1)  # Save selected route
         with col2:
-            st.button("Ruta 2", on_click=go_next_2)  # Guardar ruta seleccionada
+            st.button("Route 2", on_click=go_next_2)  # Save selected route
         with col3:
-            st.button("Ruta 3", on_click=go_next_3)  # Guardar ruta seleccionada
+            st.button("Route 3", on_click=go_next_3)
+        # Guardar ruta seleccionada
 
     elif step == 6:
         
@@ -204,12 +205,12 @@ def render_page():
     elif step == 7:
         if st.session_state.ruta:
             # Mostrar la ruta seleccionada
-            st.write(f"Ruta seleccionada: {st.session_state.ruta}")
+            st.write(f"Selected Route: {st.session_state.ruta}")
             # Llamamos a la función render de route_page.py para mostrar la ruta seleccionada
             detalls_ruta(st.session_state.ruta_completa)
             col1, col2, col3 = st.columns(3)
             with col3:
-                st.button("Finish", on_click=go_next)
+                st.button("Start Route", on_click=go_next)
     elif step == 8:
         st.header("Route Evaluation")
         # Allow the user to rate the selected route from 1 to 5
