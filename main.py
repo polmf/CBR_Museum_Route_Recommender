@@ -73,8 +73,7 @@ def go_next_3():
     st.session_state.ruta_completa = st.session_state.rutes_recomenades_reconstrudides[2]
     st.session_state.step += 2
 
-def go_final(evaluation):
-    st.session_state.evaluation = evaluation
+def go_final():
     st.success("Thank you for rating!")
     st.session_state.step += 1
 
@@ -214,8 +213,8 @@ def render_page():
     elif step == 8:
         st.header("Route Evaluation")
         # Allow the user to rate the selected route from 1 to 5
-        evaluation = st.slider("Rate the selected route (1: Very bad, 5: Excellent):", 1, 5, 3)
-        st.button("Submit Rating", on_click=go_final(evaluation))
+        st.session_state.evaluation = st.slider("Rate the selected route (1: Very bad, 5: Excellent):", 1, 5, 3)
+        st.button("Submit Rating", on_click=go_final)
         
     elif step == 9:
         cbr_2()

@@ -28,7 +28,7 @@ def cbr_revisar_retener():
 
     retener = Retener(st.session_state.user_to_recommend, feedback, st.session_state.ruta_completa, st.session_state.most_similar_cluster)
     retener.eval_saving()
-    st.success("¡Gracias por tu feedback! Se ha registrado correctamente.")
+    #st.success("¡Gracias por tu feedback! Se ha registrado correctamente.")
          
     # To do
     # if random.randint(0, 1) ==:

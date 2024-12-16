@@ -29,7 +29,7 @@ def render(routa):
     
     # Es crea un conjunt de dies per escollir
     all_days = [item['day'] for item in ruta_quadres]
-    selected_day = st.selectbox("Selecciona el día", sorted(all_days))
+    selected_day = st.selectbox("Select the day", sorted(all_days))
 
     # Filtrar per dia seleccionat
     filtered_rutas = [
@@ -45,11 +45,11 @@ def render(routa):
         for room in item['rooms'].keys()  # Obtener las claves (nombres de salas)
     }
 
-    selected_room = st.selectbox("Selecciona la sala", sorted(all_rooms))
+    selected_room = st.selectbox("Select the room", sorted(all_rooms))
 
     # Mostrar los cuadros en la sala seleccionada
-    st.header(f"Día: {selected_day}")
-    st.subheader(f"Sala: {selected_room}")
+    st.header(f"Day: {selected_day}")
+    st.subheader(f"Room: {selected_room}")
 
     # Mostrar mapa con la sala seleccionada
     MUSEU_LAYOUT = generate_museum_layout()
@@ -66,4 +66,4 @@ def render(routa):
 
                 # Mostrar los cuadros uno debajo del otro con enlaces para ver la imagen
                 for painting, link in zip(paintings, links):
-                    st.write(f"{painting} - [Ver imagen]({link})")
+                    st.write(f"{painting} - [See image]({link})")
