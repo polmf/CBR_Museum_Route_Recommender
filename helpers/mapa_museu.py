@@ -136,11 +136,12 @@ def fer_rutes(rutes_per_recomanar):
         }
         for item in data if 'ruta_quadres' in item
     ]"""
+    
 
     rutes_recomanades_total = [
         {
             "ruta_quadres": [
-                {"day": ruta[0]["day"], "rooms": list(ruta[0]["rooms"].keys())}
+                {"day": ruta['ruta_quadres'][0]["day"], "rooms": list(ruta['ruta_quadres'][0]["rooms"].keys())}
                 for ruta in rutes_per_recomanar
             ]
         }

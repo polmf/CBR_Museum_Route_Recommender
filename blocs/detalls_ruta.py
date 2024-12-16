@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def render(routa):
     """Función para renderizar días, salas y cuadros usando Streamlit."""
-    print(routa)
+    # print(routa)
     # Es crea un conjunt de dies per escollir
     """rutes_recomanades_total = [
         {
@@ -23,14 +23,18 @@ def render(routa):
         for item in routa if 'ruta_quadres' in item
     ]"""
     
+    print('route : ', routa)
+    
+    ruta_quadres = routa['ruta_quadres']
+    
     # Es crea un conjunt de dies per escollir
-    all_days = [item['day'] for item in routa]
+    all_days = [item['day'] for item in ruta_quadres]
     selected_day = st.selectbox("Selecciona el día", sorted(all_days))
 
     # Filtrar per dia seleccionat
     filtered_rutas = [
         item 
-        for item in routa
+        for item in ruta_quadres
         if item["day"] == selected_day
     ]
 

@@ -160,9 +160,10 @@ def render_page():
                 ruta_new['puntuacio'] = ruta['puntuacio']
                 ruta_new['ruta'] = ruta['ruta']
                 
-                st.session_state.rutes_recomenades_reconstrudides.append(ruta_restructurada)
+                st.session_state.rutes_recomenades_reconstrudides.append(ruta_new)
 
             fer_rutes(st.session_state.rutes_recomenades_reconstrudides)  # Llamada a tu función"""
+            # print('rutes recom recons: ', st.session_state.rutes_recomenades_reconstrudides)
         
         # Crear columnas para centrar el botón
         col1, col2, col3 = st.columns([1, 4, 1])  # 4 es el ancho de la columna central
