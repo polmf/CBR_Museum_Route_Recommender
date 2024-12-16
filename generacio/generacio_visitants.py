@@ -117,8 +117,8 @@ def simulate_multiple_visits(id, num_visits):
     visitas = []
     
     for num_visita in range(num_visits):  # Generamos varios registros de visitas para el mismo visitante
-        visitante.dies = random.randint(1, 10)  # Cambiamos el número de días de visita
-        visitante.hores = random.randint(1, 8)
+        visitante.dies = random.randint(1, 6)  # Cambiamos el número de días de visita
+        visitante.hores = random.randint(1, 6)
         if visitante.edat < 16:
             visitante.companyia = "group"
         else:
