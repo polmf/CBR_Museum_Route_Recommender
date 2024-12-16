@@ -51,6 +51,8 @@ def normalize(
 ) -> pd.DataFrame:
     
     user = convert_cat_cols_user(user)
+    
+    print('cols base de casos: ', base_de_casos.columns)
 
     cols_to_compare = base_de_casos.select_dtypes(include=['int64', 'float']).columns.to_list()
     cols_to_compare.remove('puntuacio_ruta')
