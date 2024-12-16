@@ -994,8 +994,8 @@ def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor):
         sales[sala].append(quadre)
 
     day = 1
+    max_days = 4  # Número máximo de días disponibles
     time_spent_today = 0
-    total_time_spent = 0
     paintings_to_see = []
 
     # Lista para guardar la información de cada día
@@ -1023,23 +1023,36 @@ def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor):
 
                 days.append(day_info)
 
-                total_time_spent += time_spent_today  # Añadir el tiempo del día al total
-                day += 1
+                # Si hemos llegado al máximo de días, no incrementamos el contador de días
+                if day < max_days:
+                    day += 1
                 time_spent_today = time_for_painting  # Inicia con la pintura que no cabía en el día anterior
                 paintings_to_see = [(sala, quadre, time_for_painting)]  # Empieza el nuevo día con esa pintura
 
-    # Guardar las pinturas restantes para el último día
+    # Al final, si quedan pinturas para ver, las agregamos al último día (día 4)
     if paintings_to_see:
-        day_info = {"day": day, "rooms": {}}
-        for sala_painting, quadre_painting, time_painting in paintings_to_see:
-            if sala_painting not in day_info["rooms"]:
-                day_info["rooms"][sala_painting] = []
-            day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))
+        if day <= max_days:
+            # Añadir las pinturas sobrantes al último día disponible
+            day_info = {"day": max_days, "rooms": {}}
+            for sala_painting, quadre_painting, time_painting in paintings_to_see:
+                if sala_painting not in day_info["rooms"]:
+                    day_info["rooms"][sala_painting] = []
+                day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))
 
-        days.append(day_info)
-        total_time_spent += time_spent_today  # Añadir el tiempo del último día al total
+            days.append(day_info)
+        else:
+            # Si ya hemos llegado al día máximo, no añadimos un nuevo día.
+            # Solo agregamos las pinturas al último día existente
+            last_day_info = days[-1]
+            for sala_painting, quadre_painting, time_painting in paintings_to_see:
+                if sala_painting not in last_day_info["rooms"]:
+                    last_day_info["rooms"][sala_painting] = []
+                last_day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))
 
     return days
+
+
+
 
 
 
