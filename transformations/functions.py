@@ -52,7 +52,7 @@ def normalize(
     
     user = convert_cat_cols_user(user)
 
-    cols_to_compare = base_de_casos.select_dtypes(include=['int64']).columns.to_list()
+    cols_to_compare = base_de_casos.select_dtypes(include=['int64', 'float']).columns.to_list()
     cols_to_compare.remove('puntuacio_ruta')
     cols_to_compare.remove('visitante_id')
     cols_to_compare.remove('ruta_temps')
@@ -81,9 +81,9 @@ def user_to_pd(user_to_recommend: Visitant) -> pd.DataFrame:
         "visitant_estudis": user_to_recommend.estudis,
         "visitant_coneixement": user_to_recommend.coneixements,
         "visitant_quizz": user_to_recommend.quizz,
-        "visitant_interessos_autor": user_to_recommend.interessos_autor,
-        "visitant_interessos_estils": user_to_recommend.interessos_estils,
-        "visitant_interessos_tipus": user_to_recommend.interessos_tipus,
+        "visitant_interessos_autor": [user_to_recommend.interessos_autor],
+        "visitant_interessos_estils": [user_to_recommend.interessos_estils],
+        "visitant_interessos_tipus": [user_to_recommend.interessos_tipus]
     }
 
     return pd.DataFrame(user_dict, index=[0])
@@ -101,11 +101,11 @@ def is_case_redundant(
     Comprova si un cas és redundant amb els casos existents.
     """
     
-    for idx, similarity_user in similarities_user:
-        similarity_ruta = similarities_ruta[idx]
+    for idx, ((idx_user, similarity_user), (idx_ruta, similarity_ruta)) in enumerate(zip(similarities_user, similarities_ruta)):
+        # Usamos idx para acceder a feedback_differences de forma ordenada
         if (similarity_user > user_sim_threshold and
             similarity_ruta > route_sim_threshold and
-            feedback_differences[idx] < feedback_diff_threshold):
+            feedback_differences[idx][1] < feedback_diff_threshold):  # Accedemos al valor de la diferencia de feedback
             return True  # El caso es redundante
     return False  # El caso aporta valor
 
@@ -124,11 +124,11 @@ def mesura_utilitat(
     :return: DataFrame amb la utilitat de cada cas
     """
     # get the cases from the most similar cluster
-    casos = casos[casos['cluster'] == most_similar_cluster]
+    casos_sim = casos[casos['cluster'] == most_similar_cluster]
 
     # Extraer los cuadros y convertirlos a representación binaria
     mlb = MultiLabelBinarizer()
-    cuadros_encoded = mlb.fit_transform(casos['ruta_quadres_list'])
+    cuadros_encoded = mlb.fit_transform(casos_sim['ruta_quadres_list'])
 
     route_selected_encoded = mlb.transform([route_selected['quadres']])
 
@@ -140,16 +140,18 @@ def mesura_utilitat(
 
     # calcular la similitud de los casos con el usuario
     user_to_recommend_df = user_to_pd(user_to_recommend)
-    user_to_recommend_normalized = normalize(user_to_recommend_df, casos)
+    user_to_recommend_normalized = normalize(user_to_recommend_df, casos_sim)
     similarities_user = []
-    for idx, (index, cas) in enumerate(casos.iterrows()):
-        cas_normalized = normalize(cas.to_frame().T, casos)
+    for idx, (index, cas) in enumerate(casos_sim.iterrows()):
+        cas_normalized = normalize(cas.to_frame().T, casos_sim)
         cas_normalized = cas_normalized[user_to_recommend_normalized.columns]
         similarity = cosine_similarity(user_to_recommend_normalized, cas_normalized)
         similarities_user.append((idx, similarity[0][0]))  # Acceso al valor escalar
 
-    # Calcular la diferencia de feedback
-    feedback_differences = np.abs(casos['puntuacio_ruta'] - feedback)
+    feedback_differences = []
+    for idx, puntuacion in enumerate(casos_sim['puntuacio_ruta']):
+        feedback_diff = np.abs(puntuacion - feedback)
+        feedback_differences.append((idx, feedback_diff))
 
     # Calcular la utilidad
     return not is_case_redundant(

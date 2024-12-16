@@ -105,7 +105,8 @@ class Reutilizar:
         else:  # Si la ruta dura menos de lo que el usuario quiere
             while temps_ruta < temps_user_to_recommend:
                 # Añadimos cuadros de artistas que le gustan al usuario
-                route = self.add_artist(self.user_to_recommend.interessos_autor, route)
+                if isinstance(self.user_to_recommend.interessos_autor, list):
+                    route = self.add_artist(self.user_to_recommend.interessos_autor, route)
 
                 # Añadimos cuadros relevantes
                 cuadros_relevantes = sorted(

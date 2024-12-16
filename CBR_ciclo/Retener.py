@@ -47,7 +47,10 @@ class Retener:
         self.user_to_recommend['visitante_id'] = self.base_de_casos['visitante_id'].max() + 1
         self.user_to_recommend['recompte_utilitzat'] = 1
         self.user_to_recommend['data_ultim_us'] = pd.Timestamp.now().strftime("%Y-%m-%d")
-        self.user_to_recommend['ruta_quadres'] = self.recommended_route['ruta_quadres']
+
+        self.user_to_recommend['ruta_quadres'] = [
+            self.recommended_route['ruta_quadres']
+        ] if len(self.recommended_route['ruta_quadres']) > 1 else self.recommended_route['ruta_quadres']
         
         self.user_to_recommend_normalized['cluster'] = self.most_similar_cluster
 
