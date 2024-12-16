@@ -51,8 +51,10 @@ def normalize(
 ) -> pd.DataFrame:
     
     user = convert_cat_cols_user(user)
+    
+    print('cols base de casos: ', base_de_casos.columns)
 
-    cols_to_compare = base_de_casos.select_dtypes(include=['int64']).columns.to_list()
+    cols_to_compare = base_de_casos.select_dtypes(include=['int64', 'float']).columns.to_list()
     cols_to_compare.remove('puntuacio_ruta')
     cols_to_compare.remove('visitante_id')
     cols_to_compare.remove('ruta_temps')
@@ -101,11 +103,11 @@ def is_case_redundant(
     Comprova si un cas és redundant amb els casos existents.
     """
     
-    for idx, similarity_user in similarities_user:
-        similarity_ruta = similarities_ruta[idx]
+    for (idx_user, similarity_user), (idx_ruta, similarity_ruta) in zip(similarities_user, similarities_ruta):
+        # Comprueba si el caso es redundante
         if (similarity_user > user_sim_threshold and
             similarity_ruta > route_sim_threshold and
-            feedback_differences[idx] < feedback_diff_threshold):
+            feedback_differences[idx_user] < feedback_diff_threshold):
             return True  # El caso es redundante
     return False  # El caso aporta valor
 
