@@ -31,10 +31,10 @@ class Reutilizar:
     def get_instancies(self, quadres_ruta):
         instancies = []
         for quadre_ruta in quadres_ruta:
-            for quadre in self.quadres:
-                if quadre_ruta == quadre.nom:
-                    instancies.append(quadre)
+            found = next((quadre for quadre in self.quadres if quadre_ruta == quadre.nom), None)
+            instancies.append(found if found else quadre_ruta)
         return instancies
+
 
     def get_route_from_similar_cases(
         self,
@@ -74,10 +74,7 @@ class Reutilizar:
         route['quadres'].extend(cuadros_a_añadir)
         return route
 
-    def adapt_route_to_user_preferences(
-        self,
-        route: Dict[str, Union[str, int]]
-    ):
+    def adapt_route_to_user_preferences(self, route: Dict[str, Union[str, int]]):
         """
         Adapta la ruta a las preferencias del usuario.
         """
@@ -85,7 +82,6 @@ class Reutilizar:
         temps_ruta = route['temps']
         
         if temps_ruta > temps_user_to_recommend:  # Si la ruta dura más de lo que el usuario quiere
-            # Quitamos cuadros poco relevantes de la ruta hasta que la duración sea menor
             cuadros_ordenados = sorted(
                 route['quadres'], 
                 key=lambda x: next((q.rellevancia for q in self.quadres if q.nom == x), 0)
@@ -99,16 +95,11 @@ class Reutilizar:
                     (1 + 0.04 * (self.user_to_recommend.coneixements - 1))
                 )
 
-            route['temps'] = temps_ruta
-            route['instancies'] = self.get_instancies(route['quadres'])
-
         else:  # Si la ruta dura menos de lo que el usuario quiere
             while temps_ruta < temps_user_to_recommend:
-                # Añadimos cuadros de artistas que le gustan al usuario
                 if isinstance(self.user_to_recommend.interessos_autor, list):
                     route = self.add_artist(self.user_to_recommend.interessos_autor, route)
 
-                # Añadimos cuadros relevantes
                 cuadros_relevantes = sorted(
                     self.quadres, 
                     key=lambda x: x.rellevancia, 
@@ -116,15 +107,17 @@ class Reutilizar:
                 )
                 for cuadro in cuadros_relevantes:
                     if cuadro.nom not in route['quadres']:
-                        route['quadres'].append(cuadro)
+                        route['quadres'].append(cuadro.nom)
                         temps_ruta += calculate_observation_time(cuadro, 1 + 0.04 * (self.user_to_recommend.coneixements - 1))
                         if temps_ruta >= temps_user_to_recommend:
                             break
-            
-            route['temps'] = temps_ruta
-            route['instancies'] = self.get_instancies(route['quadres'])
+
+        # Actualizamos el tiempo y obtenemos las instancias de los cuadros
+        route['temps'] = temps_ruta
+        route['instancies'] = self.get_instancies(route['quadres'])
 
         return route
+
     
     def recommend_routes(self):
         """
