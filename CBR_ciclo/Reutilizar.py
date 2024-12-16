@@ -44,11 +44,10 @@ class Reutilizar:
         for index, _ in top_3_similar_cases:
             user_data = self._base_de_casos.iloc[index]
             user_routes = user_data['ruta']
-            instancies = self.get_instancies(user_data['ruta_quadres_list'])
             
             ruta_info = {
+                'ruta': user_data['ruta'],
                 'quadres': user_data['ruta_quadres_list'],
-                'instancies': instancies,
                 'temps': user_data['ruta_temps'],
                 'puntuacio': user_data['puntuacio_ruta']
             }
@@ -94,10 +93,14 @@ class Reutilizar:
             while temps_ruta > temps_user_to_recommend and cuadros_ordenados:
                 cuadro_a_remover = cuadros_ordenados.pop(0)
                 route['quadres'].remove(cuadro_a_remover)
+
                 temps_ruta -= calculate_observation_time(
                     next(q for q in self.quadres if q.nom == cuadro_a_remover),
                     (1 + 0.04 * (self.user_to_recommend.coneixements - 1))
                 )
+
+            route['temps'] = temps_ruta
+            route['instancies'] = self.get_instancies(route['quadres'])
 
         else:  # Si la ruta dura menos de lo que el usuario quiere
             while temps_ruta < temps_user_to_recommend:
@@ -116,7 +119,9 @@ class Reutilizar:
                         temps_ruta += calculate_observation_time(cuadro, 1 + 0.04 * (self.user_to_recommend.coneixements - 1))
                         if temps_ruta >= temps_user_to_recommend:
                             break
-
+            
+            route['temps'] = temps_ruta
+            route['instancies'] = self.get_instancies(route['quadres'])
 
         return route
     

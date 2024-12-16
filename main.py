@@ -60,22 +60,22 @@ def go_next_d3():
     
 def go_next_1():
     st.session_state.ruta = 1
-    st.session_state.ruta_completa = st.session_state.rutes_recomenades[0]
+    st.session_state.ruta_completa = st.session_state.rutes_recomenades_reconstrudides[0][0]
     st.session_state.step += 2
 
 def go_next_2():
     st.session_state.ruta = 2
-    st.session_state.ruta_completa = st.session_state.rutes_recomenades[1]
+    st.session_state.ruta_completa = st.session_state.rutes_recomenades_reconstrudides[1][0]
     st.session_state.step += 2
 
 def go_next_3():
     st.session_state.ruta = 3
-    st.session_state.ruta_completa = st.session_state.rutes_recomenades[2]
+    st.session_state.ruta_completa = st.session_state.rutes_recomenades_reconstrudides[2][0]
     st.session_state.step += 2
 
 def go_final(evaluation):
     st.session_state.evaluation = evaluation
-    st.success(f"Thank you for rating!")
+    st.success("Thank you for rating!")
     st.session_state.step += 1
 
 def go_back():
@@ -147,13 +147,18 @@ def render_page():
         with st.spinner('Loading...'):
             # Asegúrate de que el spinner se muestra mientras se ejecuta la función
             st.session_state.rutes_recomenades, st.session_state.most_similar_cluster = cbr_1()
-            #print(st.session_state.rutes_recomenades[0])
+            
             st.session_state.rutes_recomenades_reconstrudides = []
             for ruta in st.session_state.rutes_recomenades:
                 ruta_nova = Ruta(nom='Ruta_nova', instancies=ruta['instancies'])
                 ruta_restructurada = reestructura_ruta(ruta_nova, st.session_state.user_to_recommend, (1 + 0.04 * (st.session_state.coneixement - 1)))
+                ruta_restructurada[0]['quadres'] = ruta['quadres']
+                ruta_restructurada[0]['temps'] = ruta['temps']
+                ruta_restructurada[0]['puntuacio'] = ruta['puntuacio']
+                ruta_restructurada[0]['ruta'] = ruta['ruta']
+                
                 st.session_state.rutes_recomenades_reconstrudides.append(ruta_restructurada)
-            print(st.session_state.rutes_recomenades_reconstrudides[0])
+
             fer_rutes(st.session_state.rutes_recomenades_reconstrudides)  # Llamada a tu función"""
         
         # Crear columnas para centrar el botón

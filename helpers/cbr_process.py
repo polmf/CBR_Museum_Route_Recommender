@@ -16,13 +16,19 @@ def cbr_recuperar_reutilizar():
 
 def cbr_revisar_retener():
 
-    revisar = Revisar(st.session_state.user_to_recommend, st.session_state.ruta_completa, st.session_state.evaluation)
+    revisar = Revisar(
+        st.session_state.user_to_recommend, 
+        st.session_state.ruta_completa, 
+        st.session_state.evaluation,
+        st.session_state.most_similar_cluster
+    )
     feedback = revisar.get_feedback()
 
-    if st.button("Enviar Feedback"):
-        retener = Retener(st.session_state.user_to_recommend, feedback, st.session_state.ruta_completa, st.session_state.most_similar_cluster)
-        retener.eval_saving()
-        st.success("¡Gracias por tu feedback! Se ha registrado correctamente.")
+    print("Ruta completa:", st.session_state.ruta_completa)
+
+    retener = Retener(st.session_state.user_to_recommend, feedback, st.session_state.ruta_completa, st.session_state.most_similar_cluster)
+    retener.eval_saving()
+    st.success("¡Gracias por tu feedback! Se ha registrado correctamente.")
          
     # To do
     # if random.randint(0, 1) ==:

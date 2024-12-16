@@ -8,12 +8,13 @@ class Revisar:
     Recoger el feedback del usuario y, si no está satisfecho, realizar ajustes en las rutas futuras.
     """
 
-    def __init__(self, user_to_recommend, route_selected, feedback):
+    def __init__(self, user_to_recommend, route_selected, feedback, most_similar_cluster):
         self.feedback = None
         self.user_to_recommend = user_to_recommend
-        self.user_to_recommend_normalized = self.prepare_user_to_recommend()
         self.route_selected = route_selected
         self.user_feedback = feedback
+        self.most_similar_cluster = most_similar_cluster
+        self.user_to_recommend_normalized = self.prepare_user_to_recommend()
         self.agent_model = catboost.CatBoostRegressor()
         self.agent_model.load_model('CBR_ciclo/agent_model/best_catboost_model.cb')
 
@@ -25,16 +26,17 @@ class Revisar:
         user_to_recommend = {
             'visitant_edat': self.user_to_recommend.edat,
             'visitant_visites': self.user_to_recommend.visites,
-            'visitant_temps_total': temps_total,
             'visitant_companyia': self.user_to_recommend.companyia,
             'visitant_estudis': self.user_to_recommend.estudis,
             'visitant_coneixement': self.user_to_recommend.coneixements,
             'visitant_quizz': self.user_to_recommend.quizz,
             'visitant_interessos_estils': self.user_to_recommend.interessos_estils,
             'visitant_interessos_tipus': self.user_to_recommend.interessos_tipus,
+            'cluster': self.most_similar_cluster,
+            'temps_total': temps_total,
         }
 
-        user_to_recommend = pd.DataFrame(user_to_recommend)
+        user_to_recommend = pd.DataFrame([user_to_recommend])
 
         user_to_recommend['visitant_interessos_estils'] = user_to_recommend['visitant_interessos_estils'].apply(
             lambda x: x[0] if isinstance(x, list) else x)
@@ -75,4 +77,4 @@ class Revisar:
         
         final_feedback = (self.user_feedback + agent_feedback) / 2
 
-        return final_feedback
+        return float(final_feedback[0])

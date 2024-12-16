@@ -2,7 +2,7 @@ from typing import List, Tuple
 import numpy as np
 import pandas as pd
 from sklearn.metrics import jaccard_score
-from torch import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity
 from generacio.classes import Visitant
 from sklearn.preprocessing import MultiLabelBinarizer
 
@@ -21,20 +21,26 @@ def convert_cat_cols_user(
 ) -> pd.DataFrame:
     
     for estil in interessos_estils:
-        user[f'estil_{estil}'] = user['visitant_interessos_estils'].apply(lambda x: 1 if estil in x else 0)
+        user[f'estil_{estil}'] = user['visitant_interessos_estils'].apply(
+            lambda x: 1 if estil.lower() in [elem.lower() for elem in x] else 0
+        )
 
     # Creem una columna binària per cada companyia
     for comp in companyia:
-        user[f'companyia_{comp}'] = user['visitant_companyia'].apply(lambda x: 1 if comp in x else 0)
+        user[f'companyia_{comp}'] = user['visitant_companyia'].apply(
+            lambda x: 1 if comp.lower() in [elem.lower() for elem in x] else 0
+        )
 
     # Creem una columna binària per cada tipus d'interès
     for tipus in interessos_types:
-        user[f'interes_{tipus}'] = user['visitant_interessos_tipus'].apply(lambda x: 1 if tipus in x else 0)
+        user[f'interes_{tipus}'] = user['visitant_interessos_tipus'].apply(
+            lambda x: 1 if tipus.lower() in [elem.lower() for elem in x] else 0
+        )
 
     # convertim la columna visitant_estudis a binaria
     user['visitant_estudis'] = user['visitant_estudis'].apply(lambda x: 1 if x else 0)
 
-    user.drop(columns=['visitant_interessos_estils', 'visitant_interessos_autor', 
+    user = user.drop(columns=['visitant_interessos_estils', 'visitant_interessos_autor', 
                                       'visitant_companyia', 'visitant_interessos_tipus'])
 
     return user
@@ -122,23 +128,25 @@ def mesura_utilitat(
 
     # Extraer los cuadros y convertirlos a representación binaria
     mlb = MultiLabelBinarizer()
-    cuadros_encoded = mlb.fit_transform(casos['ruta_quadres'])
+    cuadros_encoded = mlb.fit_transform(casos['ruta_quadres_list'])
 
-    route_selected_encoded = mlb.transform([route_selected['ruta_quadres']])
+    route_selected_encoded = mlb.transform([route_selected['quadres']])
 
     # Calcular la similitud Jaccard con las rutas existentes
     similarities_ruta = []
-    for idx, ruta_vector in enumerate(cuadros_encoded):
+    for idx, ruta_vector in enumerate(cuadros_encoded):  # Usar índices de `casos`
         similarity = jaccard_score(route_selected_encoded[0], ruta_vector)
         similarities_ruta.append((idx, similarity))
-    
+
     # calcular la similitud de los casos con el usuario
-    user_to_recommend_normalized = normalize(user_to_recommend)
+    user_to_recommend_df = user_to_pd(user_to_recommend)
+    user_to_recommend_normalized = normalize(user_to_recommend_df, casos)
     similarities_user = []
-    for idx, cas in casos.iterrows():
-        cas_normalized = normalize(cas)
+    for idx, (index, cas) in enumerate(casos.iterrows()):
+        cas_normalized = normalize(cas.to_frame().T, casos)
+        cas_normalized = cas_normalized[user_to_recommend_normalized.columns]
         similarity = cosine_similarity(user_to_recommend_normalized, cas_normalized)
-        similarities_user.append((idx, similarity))
+        similarities_user.append((idx, similarity[0][0]))  # Acceso al valor escalar
 
     # Calcular la diferencia de feedback
     feedback_differences = np.abs(casos['puntuacio_ruta'] - feedback)
