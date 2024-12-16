@@ -124,34 +124,23 @@ def move_through_corridors(ax, start, end):
 
 def fer_rutes(rutes_per_recomanar):
     MUSEU_LAYOUT = generate_museum_layout()
-    
 
-    # Crear una lista con las rutas completas de 'ruta_quadres'
-    """rutes_recomanades_total = [
-        {
-            "ruta_quadres": [
-                {"day": entry["day"], "rooms": list(entry["rooms"].keys())}
-                for entry in item['ruta_quadres']
-            ]
-        }
-        for item in data if 'ruta_quadres' in item
-    ]"""
-    
-
+    # Crear una lista completa con las rutas y días
     rutes_recomanades_total = [
         {
             "ruta_quadres": [
-                {"day": ruta['ruta_quadres'][0]["day"], "rooms": list(ruta['ruta_quadres'][0]["rooms"].keys())}
-                for ruta in rutes_per_recomanar
+                {"day": dia["day"], "rooms": list(dia["rooms"].keys())}
+                for dia in ruta["ruta_quadres"]
             ]
         }
+        for ruta in rutes_per_recomanar
     ]
-    
 
-    # Crear gifs por cada día y acceder al índice
+    # Crear gifs per cada dia i ruta
     for idx, ruta_recomanada in enumerate(rutes_recomanades_total):
         for dia in ruta_recomanada["ruta_quadres"]:
-            print(dia)
+            #print(f"Creant vídeo per a la ruta {idx + 1}, dia {dia['day']}: {dia['rooms']}")
             create_day_gif(dia["day"], dia["rooms"], idx + 1, MUSEU_LAYOUT)
+
 
 #fer_rutes()
