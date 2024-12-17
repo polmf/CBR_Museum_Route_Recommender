@@ -36,7 +36,7 @@ def cbr_revisar_retener():
          
     # To do oblit de casos
     # entrar en el if 1 de cada 1000 vegades
-    if random.randint(1, 10000) == 1:
+    if True:
         # Cargar las bases de datos
         base_de_casos = pd.read_json("data/base_de_dades_final.json")
         base_de_casos_normalized = pd.read_csv("data/base_de_dades_normalized.csv")
@@ -49,7 +49,7 @@ def cbr_revisar_retener():
         
         # Guardar las bases de datos actualizadas
         base_de_casos_actualizada.to_json("data/base_de_dades_final.json", orient="records", lines=False)
-        base_de_casos_normalized_actualizada.to_csv("data/base_de_dades_normalized.csv", index=False)
+        base_de_casos_normalized_actualizada.to_csv("data/base_de_dades_final_normalized.csv", index=False, header=True)
         
         # Mostrar resultados (si se ejecuta en Streamlit o consola)
         print("Limpieza completada.")
