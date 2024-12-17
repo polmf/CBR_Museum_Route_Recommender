@@ -35,16 +35,17 @@ def cbr_revisar_retener():
     #st.success("¡Gracias por tu feedback! Se ha registrado correctamente.")
          
     # To do oblit de casos
-    # entrar en el if 1 de cada 1000 vegades
-    if True:
+    # entrar en el if 1 de cada 10000 vegades
+    if random.randint(1, 10000) == 1:
         # Cargar las bases de datos
         base_de_casos = pd.read_json("data/base_de_dades_final.json")
         base_de_casos_normalized = pd.read_csv("data/base_de_dades_normalized.csv")
         
         # Limpiar los casos antiguos de la base sin normalizar
-        base_de_casos_actualizada, casos_eliminados = clean_old_cases(base_de_casos)
+        casos_eliminados = clean_old_cases(base_de_casos)
         
         # Eliminar los mismos casos en la base normalizada usando los índices
+        base_de_casos_actualizada = base_de_casos.drop(casos_eliminados.index)
         base_de_casos_normalized_actualizada = base_de_casos_normalized.drop(casos_eliminados.index)
         
         # Guardar las bases de datos actualizadas

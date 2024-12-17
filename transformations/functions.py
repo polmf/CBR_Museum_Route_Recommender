@@ -179,5 +179,5 @@ def clean_old_cases(case_base):
                                 (case_base["recompte_utilitzat"] < 2)]
     case_base_updated = case_base.drop(cases_to_remove.index)
     
-    return case_base_updated, cases_to_remove
+    return cases_to_remove
     
