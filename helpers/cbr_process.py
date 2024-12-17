@@ -47,6 +47,8 @@ def cbr_revisar_retener():
         # Eliminar los mismos casos en la base normalizada usando los índices
         base_de_casos_actualizada = base_de_casos.drop(casos_eliminados.index)
         base_de_casos_normalized_actualizada = base_de_casos_normalized.drop(casos_eliminados.index)
+
+        base_de_casos["data_ultim_us"] = pd.to_datetime(base_de_casos["data_ultim_us"], errors='coerce')
         
         # Guardar las bases de datos actualizadas
         base_de_casos_actualizada.to_json("data/base_de_dades_final.json", orient="records", lines=False)
