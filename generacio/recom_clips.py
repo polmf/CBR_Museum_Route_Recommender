@@ -981,6 +981,28 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
 
     return days
 
+
+def combinar_dias(days):
+    # Crear un diccionario para almacenar los días combinados
+    dias_combinados = {}
+
+    for dia_data in days:
+        dia = dia_data['day']
+        salas = dia_data['rooms']
+
+        # Si el día ya está en el diccionario, combinar las salas
+        if dia in dias_combinados:
+            for sala, obras in salas.items():
+                if sala in dias_combinados[dia]:
+                    dias_combinados[dia][sala].extend(obras)
+                else:
+                    dias_combinados[dia][sala] = obras
+        else:
+            dias_combinados[dia] = salas
+
+    # Reconstruir la lista en el formato original
+    return [{'day': dia, 'rooms': salas} for dia, salas in dias_combinados.items()]
+
 def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor, max_days):
     total_time_per_day = visitant.hores * 60 + (visitant.hores * 60 * 0.1)  # Tiempo total disponible por día en minutos
     epsilon = 1e-6  # Margen para evitar errores de precisión
@@ -1039,20 +1061,18 @@ def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor, max_d
                 day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))
 
             days.append(day_info)
-        else:
+        """else:
             # Si ya hemos llegado al día máximo, no añadimos un nuevo día.
             # Solo agregamos las pinturas al último día existente
             last_day_info = days[-1]
             for sala_painting, quadre_painting, time_painting in paintings_to_see:
                 if sala_painting not in last_day_info["rooms"]:
                     last_day_info["rooms"][sala_painting] = []
-                last_day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))
+                last_day_info["rooms"][sala_painting].append((quadre_painting.nom, quadre_painting.url, time_painting))"""
+
+    days = combinar_dias(days)
 
     return days
-
-
-
-
 
 
 def puntuar_ruta():
