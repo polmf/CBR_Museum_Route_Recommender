@@ -47,6 +47,7 @@ def render(routa):
 
     selected_room = st.selectbox("Select the room", sorted(all_rooms))
 
+    
     # Mostrar los cuadros en la sala seleccionada
     st.header(f"Day: {selected_day}")
     st.subheader(f"Room: {selected_room}")
@@ -63,7 +64,8 @@ def render(routa):
                 # Extraemos solo los nombres de los cuadros de las sublistas
                 paintings = [painting[0] for painting in room_data]
                 links = [painting[1] for painting in room_data]  # Obtenemos los enlaces de las imágenes
+                minuts = [painting[2] for painting in room_data]
 
                 # Mostrar los cuadros uno debajo del otro con enlaces para ver la imagen
-                for painting, link in zip(paintings, links):
-                    st.write(f"{painting} - [See image]({link})")
+                for painting, minuts, link in zip(paintings, minuts, links):
+                    st.write(f"{painting} - {minuts} min - [See image]({link})")
