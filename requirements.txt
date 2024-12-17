@@ -1,0 +1,11 @@
+streamlit
+random
+generacio
+blocs
+helpers
+matplotlib
+imageio
+pandas
+numpy
+scipy
+catboost
