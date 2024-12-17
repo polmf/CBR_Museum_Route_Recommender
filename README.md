@@ -8,7 +8,7 @@ Este proyecto tiene como objetivo la creación de un sistema de recomendación p
 
 Asegúrate de tener los siguientes paquetes instalados:
 
-- Python 3.x
+- Python 
 - Streamlit
 - Jupyter Notebooks
 - Bibliotecas adicionales (se mencionan a continuación)
