@@ -196,6 +196,8 @@ def render_page():
     elif step == 6:
         # Paso 4: Selección de la ruta
         st.header("Choose your route")
+        temps_list = [route['temps'] for route in st.session_state.rutes_recomenades_reconstrudides]
+        
         # Display buttons to select routes
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -205,7 +207,7 @@ def render_page():
         with col3:
             st.button("Route 3 Details", on_click=go_next_d3)
 
-        rutes_recomenades()  # Call the function that renders the routes
+        rutes_recomenades(temps_list)  # Call the function that renders the routes
 
         with col1:
             st.button("Route 1", on_click=go_next_1)  # Save selected route
