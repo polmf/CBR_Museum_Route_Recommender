@@ -55,7 +55,6 @@ class Retener:
         self.user_to_recommend_normalized['cluster'] = self.most_similar_cluster
 
         self.base_de_casos = pd.concat([self.base_de_casos, self.user_to_recommend], ignore_index=True)
-        print('\nbase de casos cols: ', self.base_de_casos)
         self.base_de_casos.to_json("data/base_de_dades_final.json", orient="records", lines=False)
         
         self.base_de_casos_normalized = pd.concat([self.base_de_casos_normalized, self.user_to_recommend_normalized], ignore_index=True)

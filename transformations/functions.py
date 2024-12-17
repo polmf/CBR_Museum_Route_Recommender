@@ -52,8 +52,6 @@ def normalize(
 ) -> pd.DataFrame:
     
     user = convert_cat_cols_user(user)
-    
-    print('cols base de casos: ', base_de_casos.columns)
 
     cols_to_compare = base_de_casos.select_dtypes(include=['int64', 'float']).columns.to_list()
     cols_to_compare.remove('puntuacio_ruta')
@@ -61,6 +59,7 @@ def normalize(
     cols_to_compare.remove('ruta_temps')
     cols_to_compare.remove('cluster')
     cols_to_compare.remove('recompte_utilitzat')
+    cols_to_compare.remove('data_ultim_us') if 'data_ultim_us' in cols_to_compare else None
 
     for col in cols_to_compare:
         max_value = base_de_casos[col].max()
