@@ -9,6 +9,7 @@ from blocs.art_quiz import render as art_quiz
 from blocs.interests import render as interests
 from blocs.rutes_proposades import render as rutes_recomenades
 from blocs.detalls_ruta import render as detalls_ruta
+from blocs.result_quiz import render as result_quiz
 from helpers.database import load_database
 from helpers.mapa_museu import fer_rutes
 from helpers.cbr_process import cbr_recuperar_reutilizar as cbr_1
@@ -99,6 +100,7 @@ def render_page():
         col1, col2, col3 = st.columns(3)
         with col3:
             st.button("Next", on_click=go_next)
+
     elif step == 1:
         personal_bg()  # Página 2: Personal Background
         col1, col2, col3 = st.columns(3)
@@ -106,21 +108,31 @@ def render_page():
             st.button("Back", on_click=go_back)
         with col3:
             st.button("Next", on_click=go_next)
+
     elif step == 2:
         art_quiz()  # Página 3: Art Quiz
         col1, col2, col3 = st.columns(3)
         with col1:
             st.button("Back", on_click=go_back)
-        with col3:
+        with col3:                
             st.button("Next", on_click=go_next)
+
     elif step == 3:
+        result_quiz()
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.button("Back", on_click=go_back)
+        with col3:
+            st.button("Finish", on_click=go_next)
+
+    elif step == 4:
         interests(df)  # Página 4: Interests
         col1, col2, col3 = st.columns(3)
         with col1:
             st.button("Back", on_click=go_back)
         with col3:
             st.button("Finish", on_click=go_next)
-    elif step == 4:
+    elif step == 5:
         # Limpiar la pantalla de la página anterior
         st.session_state.user_to_recommend = Visitant(
             visites=st.session_state.visitas,
@@ -170,7 +182,7 @@ def render_page():
             # Este botón se centra en la columna 2
             st.button("View Recommended Routes", on_click=go_next)
             
-    elif step == 5:
+    elif step == 6:
         # Paso 4: Selección de la ruta
         st.header("Choose your route")
         # Display buttons to select routes
@@ -192,7 +204,7 @@ def render_page():
             st.button("Route 3", on_click=go_next_3)
         # Guardar ruta seleccionada
 
-    elif step == 6:
+    elif step == 7:
         
         detalls_ruta(st.session_state.druta)
 
@@ -201,7 +213,7 @@ def render_page():
         with col1:
             st.button("Back", on_click=go_back)
         
-    elif step == 7:
+    elif step == 8:
         if st.session_state.ruta:
             # Mostrar la ruta seleccionada
             st.write(f"Selected Route: {st.session_state.ruta}")
@@ -210,13 +222,13 @@ def render_page():
             col1, col2, col3 = st.columns(3)
             with col3:
                 st.button("Start Route", on_click=go_next)
-    elif step == 8:
+    elif step == 9:
         st.header("Route Evaluation")
         # Allow the user to rate the selected route from 1 to 5
         st.session_state.evaluation = st.slider("Rate the selected route (1: Very bad, 5: Excellent):", 1, 5, 3)
         st.button("Submit Rating", on_click=go_final)
         
-    elif step == 9:
+    elif step == 10:
         cbr_2()
         st.header("Goodbye!")
         st.write("Thank you for exploring the museum with us! We hope you enjoyed your experience.")
