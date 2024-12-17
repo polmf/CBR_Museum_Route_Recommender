@@ -150,7 +150,7 @@ def render_page():
             st.session_state.rutes_recomenades_reconstrudides = []
             for ruta in st.session_state.rutes_recomenades:
                 ruta_nova = Ruta(nom='Ruta_nova', instancies=ruta['instancies'])
-                ruta_restructurada = reestructura_ruta(ruta_nova, st.session_state.user_to_recommend, (1 + 0.04 * (st.session_state.coneixement - 1)))
+                ruta_restructurada = reestructura_ruta(ruta_nova, st.session_state.user_to_recommend, (1 + 0.04 * (st.session_state.coneixement - 1)), st.session_state.dies)
                 
                 ruta_new = {}
                 ruta_new['ruta_quadres'] = ruta_restructurada

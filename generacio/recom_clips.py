@@ -981,7 +981,7 @@ def show_paintings_by_rooms(ruta, visitant, knowledge_factor):
 
     return days
 
-def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor):
+def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor, max_days):
     total_time_per_day = visitant.hores * 60 + (visitant.hores * 60 * 0.1)  # Tiempo total disponible por día en minutos
     epsilon = 1e-6  # Margen para evitar errores de precisión
     sales = {}
@@ -994,7 +994,6 @@ def show_paintings_by_rooms_sense_prints(ruta, visitant, knowledge_factor):
         sales[sala].append(quadre)
 
     day = 1
-    max_days = 4  # Número máximo de días disponibles
     time_spent_today = 0
     paintings_to_see = []
 
