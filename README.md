@@ -41,13 +41,14 @@ Para ejecutar el proyecto, sigue estos pasos:
 ### Configuración Personalizada
 
 Si deseas personalizar el sistema con casos iniciales o instancias personalizadas, sigue estos pasos:
-	1.	Modificar los ficheros de configuración:
+
+1.	**Modificar los ficheros de configuración**:
 Los archivos generacio_instancias.py y generacio_visitants.py están ubicados en la carpeta generacio. Modifica estos archivos para establecer los datos de instancias y visitantes según tus preferencias.
-	2.	Ejecutar el análisis de casos:
+2.	**Ejecutar el análisis de casos**:
 Abre y ejecuta el notebook analisi_casos.ipynb ubicado en la carpeta cbr_ciclo. Esto realizará el análisis de los casos y generará las instancias necesarias para el modelo.
-	3.	Entrenar y guardar el modelo:
+3.	**Entrenar y guardar el modelo**:
 Abre y ejecuta el notebook agent_model en la misma carpeta (cbr_ciclo). Esto entrenará un modelo basado en los datos configurados y lo guardará para su posterior uso.
-	4.	Ejecutar el archivo principal:
+4.	**Ejecutar el archivo principal**:
 Una vez hayas completado los pasos anteriores, el sistema estará listo para funcionar. Vuelve a ejecutar el comando:
    ```bash
    streamlit run main.py
