@@ -18,7 +18,7 @@ Asegúrate de tener los siguientes paquetes instalados:
 1. **Clona el repositorio:**
 
    ```bash
-   git clone <url-del-repositorio>
+   git clone https://github.com/polmf/SBC_2.git
    ```
 2. **Instala las dependencias:**
 
