@@ -56,7 +56,10 @@ Una vez hayas completado los pasos anteriores, el sistema estará listo para fun
 
 ## Contribuidores
 Miquel Ropero Serrano
+
 Pol Margarit Fisas
+
 Lola Monroy Mir
+
 Lluc Furriols Llimargas
 
