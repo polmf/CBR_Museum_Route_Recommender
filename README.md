@@ -1,4 +1,4 @@
-# SBC_2
+# CBR Museum Route Recommender
 
 # Proyecto de Recomendación en Museos
 
