@@ -120,8 +120,6 @@ def render_page():
     elif step == 3:
         result_quiz()
         col1, col2, col3 = st.columns(3)
-        with col1:
-            st.button("Back", on_click=go_back)
         with col3:
             st.button("Finish", on_click=go_next)
 
