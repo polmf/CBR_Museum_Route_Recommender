@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Tuple
 import numpy as np
 import pandas as pd
@@ -160,4 +161,23 @@ def mesura_utilitat(
         similarities_user, similarities_ruta, feedback_differences
         )
 
+
+def clean_old_cases(case_base):
+    """
+    Elimina casos no utilizados en los últimos 6 meses y con menos de 2 usos.
+    """
+    print("Columnas disponibles:", case_base.columns)
+
+    today = datetime.datetime.now()
+    threshold_date = today - datetime.timedelta(days=6 * 30)  # Aproximadamente 6 meses
+    
+    # Asegurarse de que las fechas están en formato datetime
+    case_base["data_ultim_us"] = pd.to_datetime(case_base["data_ultim_us"], errors='coerce')
+    
+    # Filtrar y eliminar casos antiguos
+    cases_to_remove = case_base[(case_base["data_ultim_us"] < threshold_date) & 
+                                (case_base["recompte_utilitzat"] < 2)]
+    case_base_updated = case_base.drop(cases_to_remove.index)
+    
+    return case_base_updated, cases_to_remove
     
