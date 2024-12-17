@@ -60,7 +60,7 @@ def mark_room_by_number(room_number, MUSEU_LAYOUT):
     return fig 
 
 # Crear un gif per cada dia
-def create_day_gif(day, route, idx, MUSEU_LAYOUT, output_dir="museum_videos"):
+def create_day_gif(day, route, idx, MUSEU_LAYOUT, output_dir="helpers/museum_videos"):
     # Crear el directorio si no existe
     os.makedirs(output_dir, exist_ok=True)
     frames = []

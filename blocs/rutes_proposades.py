@@ -2,7 +2,7 @@ import streamlit as st
 import os
 
 # Directorio donde se encuentran los videos (ya convertidos de GIFs)
-output_dir = os.path.join(os.getcwd(), "museum_videos")  # Aseguramos que el directorio es accesible
+output_dir = os.path.join(os.getcwd(), "helpers/museum_videos")  # Aseguramos que el directorio es accesible
 
 # Función para mostrar los videos de las tres rutas basados en el día
 def mostrar_videos(dia, total_time):
